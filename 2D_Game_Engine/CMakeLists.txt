@@ -9,13 +9,14 @@ if (POLICY CMP0141)
   set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
-project ("2D_Game_Engine")
+project (2D_Game_Engine_Project)
 
+add_subdirectory (Phys_Part_Test)
 # Add source to this project's executable.
-add_executable (2D_Game_Engine "2D_Game_Engine.cpp" "2D_Game_Engine.h")
+add_executable (2D_Game_Engine_Project "2D_Game_Engine.cpp" "2D_Game_Engine.h")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
-  set_property(TARGET 2D_Game_Engine PROPERTY CXX_STANDARD 20)
+  set_property(TARGET 2D_Game_Engine_Project PROPERTY CXX_STANDARD 20)
 endif()
 
 # TODO: Add tests and install targets if needed.
