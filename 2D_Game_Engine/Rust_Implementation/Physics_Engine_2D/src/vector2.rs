@@ -1,7 +1,9 @@
 use std::ops::Add;
+use std::ops::AddAssign;
 use std::ops::Sub;
 use std::ops::Mul;
 use std::ops::Div;
+use std::ops::SubAssign;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vector2
@@ -31,9 +33,9 @@ impl Vector2
             y : self.y * value
         }
     }
-    pub fn dotProduct(self, other : Vector2) -> f32
+    pub fn dot_product(self, rhs : Vector2) -> f32
     {
-        return (self.x * other.x) + (self.y * other.y);
+        return (self.x * rhs.x) + (self.y * rhs.y);
     }
     pub fn perpendicular(self) -> Vector2
     {
@@ -64,48 +66,85 @@ impl Vector2
 impl Sub for Vector2
 {
     type Output = Vector2;
-    fn sub(self, _other : Vector2) -> Vector2
+    fn sub(self, _rhs : Vector2) -> Vector2
     {
         Vector2
         {
-            x: self.x - _other.x,
-            y: self.y - _other.y
+            x: self.x - _rhs.x,
+            y: self.y - _rhs.y
         }
     }
 }
+
 impl Add for Vector2
 {
     type Output = Vector2;
-    fn add(self, _other: Vector2) -> Vector2
+    fn add(self, _rhs: Vector2) -> Vector2
     {
         Vector2
         {
-            x: self.x + _other.x,
-            y: self.y + _other.y
+            x: self.x + _rhs.x,
+            y: self.y + _rhs.y
         }
     }
 }
-impl Mul for Vector2
+
+impl AddAssign<Vector2> for Vector2
+{ 
+    fn add_assign(&mut self, rhs: Vector2) 
+    {
+        self.x += rhs.x;
+        self.y += rhs.y;
+    }
+}
+
+impl SubAssign<Vector2> for Vector2
+{
+    fn sub_assign(&mut self, rhs: Vector2) 
+    {
+        self.x -= rhs.x;
+        self.y -= rhs.y; 
+    }
+}
+
+impl Mul<Vector2> for Vector2
 {
     type Output = Vector2;
-    fn mul(self, _other: Vector2) -> Vector2
+    fn mul(self, _rhs: Vector2) -> Vector2
     {
         Vector2
         {
-            x: self.x * _other.x,
-            y: self.y * _other.y
+            x: self.x * _rhs.x,
+            y: self.y * _rhs.y
         }
     }
 }
+impl Mul<f32> for Vector2
+{
+    type Output = Vector2;
+    fn mul(self,_rhs : f32) -> Vector2
+    {
+        Vector2{x: self.x,y: self.y}.scale(_rhs)
+    }
+}
+impl Mul<i32> for Vector2
+{
+    type Output = Vector2;
+    fn mul(self,_rhs : i32) -> Vector2
+    {
+        Vector2{x: self.x,y: self.y}.scale(_rhs as f32)
+    }
+}
+
 impl Div for Vector2
 {
     type Output = Vector2;
-    fn div(self, _other: Vector2) -> Vector2
+    fn div(self, _rhs: Vector2) -> Vector2
     {
         Vector2
         {
-            x: self.x / _other.x,
-            y: self.y / _other.y
+            x: self.x / _rhs.x,
+            y: self.y / _rhs.y
         }
     }
 }
