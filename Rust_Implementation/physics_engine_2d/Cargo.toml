@@ -1,5 +1,5 @@
 [package]
-name = "Physics_Engine_2D"
+name = "physics_engine_2d"
 version = "0.1.0"
 edition = "2021"
 

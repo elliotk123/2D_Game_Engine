@@ -1,4 +1,4 @@
-use crate::Vector2;
+use crate::vector2::Vector2;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Particle

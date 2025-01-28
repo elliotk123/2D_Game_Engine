@@ -1,0 +1,8 @@
+[package]
+name = "game_engine_2d"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+physics_engine_2d = {path = "../physics_engine_2d"}
+graphics_engine_2d = {path = "../graphics_engine_2d"}

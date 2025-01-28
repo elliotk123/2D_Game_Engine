@@ -1,5 +1,5 @@
 use std::vec;
-use crate::Vector2;
+use crate::vector2::Vector2;
 
 #[derive(Debug, Clone)]
 pub struct Shape
