@@ -1,7 +1,18 @@
-#[derive(Debug, Copy, Clone)]
+use std::vec;
+use crate::Vector2;
+
+#[derive(Debug, Clone)]
 pub struct Shape
 {
-    num_vertices : i8,
-    vertices    : Box<[f32]>
-
+    vertices    : Vec<Vector2>
+}
+impl Shape
+{
+    pub fn new(vertices:Vec<Vector2>)->Shape
+    {
+        Shape
+        {
+            vertices
+        }
+    }
 }
