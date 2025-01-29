@@ -8,8 +8,8 @@ use std::ops::SubAssign;
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Vector2
 {
-    x  : f32,
-    y  : f32
+    pub x  : f32,
+    pub y  : f32
 }
 impl Vector2
 {

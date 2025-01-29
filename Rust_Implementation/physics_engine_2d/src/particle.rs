@@ -1,6 +1,6 @@
 use crate::vector2::Vector2;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Particle
 {
     pub position     : Vector2,
@@ -40,10 +40,12 @@ mod tests
     fn test_particle_new()
     {
         let p_test : Particle = Particle::new(Vector2::new(2.0,3.0), Vector2::new(0.5, 0.25), 1.5, 0.5);
-        assert_eq!(p_test.position,         Vector2::new(2.0, 3.0));
-        assert_eq!(p_test.linear_velocity,  Vector2::new(0.5, 0.25)); 
-        assert_eq!(p_test.angular_velocity, 1.5);
-        assert_eq!(p_test.orientation,      0.5);
+        assert_eq!(p_test.position.x,        2.0);
+        assert_eq!(p_test.position.y,        3.0);
+        assert_eq!(p_test.linear_velocity.x, 0.5); 
+        assert_eq!(p_test.linear_velocity.y, 0.25); 
+        assert_eq!(p_test.angular_velocity,  1.5);
+        assert_eq!(p_test.orientation,       0.5);
     }
 
     #[test]
@@ -54,19 +56,23 @@ mod tests
         
         p_test.update(delta_t, Vector2::new(1.0,1.0), 0.0);
         
-        assert_eq!(p_test.position,         Vector2::new(2.5,3.5));
-        assert_eq!(p_test.linear_velocity,  Vector2::new(3.0, 4.0));
-        assert_eq!(p_test.angular_velocity, 0.0);
-        assert_eq!(p_test.orientation,      0.0);
+        assert_eq!(p_test.position.x,        2.5);
+        assert_eq!(p_test.position.y,        3.5);
+        assert_eq!(p_test.linear_velocity.x, 3.0);
+        assert_eq!(p_test.linear_velocity.y, 4.0);
+        assert_eq!(p_test.angular_velocity,  0.0);
+        assert_eq!(p_test.orientation,       0.0);
 
         p_test = Particle::new(Vector2::new(0.0,0.0), Vector2::new(0.0, 0.0), 1.0, 1.0);
         delta_t = 3.0;
 
         p_test.update(delta_t, Vector2::new(0.0,0.0), 1.0);
-        assert_eq!(p_test.position,         Vector2::new(0.0,0.0));
-        assert_eq!(p_test.linear_velocity,  Vector2::new(0.0,0.0));
-        assert_eq!(p_test.angular_velocity, 4.0);
-        assert_eq!(p_test.orientation,      8.5);
+        assert_eq!(p_test.position.x,        0.0);
+        assert_eq!(p_test.position.y,        0.0);
+        assert_eq!(p_test.linear_velocity.x, 0.0);
+        assert_eq!(p_test.linear_velocity.y, 0.0);
+        assert_eq!(p_test.angular_velocity,  4.0);
+        assert_eq!(p_test.orientation,       8.5);
 
     }
 }

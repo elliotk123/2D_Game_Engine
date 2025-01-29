@@ -1,10 +1,9 @@
-use std::vec;
 use crate::vector2::Vector2;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Shape
 {
-    vertices    : Vec<Vector2>
+    pub vertices    : Vec<Vector2>
 }
 impl Shape
 {

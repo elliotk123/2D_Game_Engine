@@ -2,7 +2,7 @@ use crate::vector2::Vector2;
 use crate::particle::{self, Particle};
 use crate::shape::{self, Shape};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Entity
 {
     particle           : Particle,
@@ -54,4 +54,41 @@ impl Entity
         self.particle.update(delta_t, total_force, total_torque)
     }
 
+}
+
+#[cfg(test)]
+mod tests 
+{
+    use super::*;
+
+    #[test]
+    fn test_entity_new()
+    {
+        let p1 : Particle = Particle::new(Vector2::new(0.0, 0.0), Vector2::new(1.0, 1.0), 0.0, 0.0);
+        let s1 : Shape = Shape::new(vec![Vector2::new(-0.5, 0.0),Vector2::new(0.0, 1.0),Vector2::new(0.5,0.0)]);
+        let e1 : Entity = Entity::new(p1, s1.clone(), 1.0, 1.0);
+
+        assert_eq!(e1.particle,          p1);
+        assert_eq!(e1.shape,             s1);
+        assert_eq!(e1.mass ,             1.0);
+        assert_eq!(e1.moment_of_inertia, 1.0);
+    }
+
+    #[test]
+    fn test_entity_apply_force()
+    {
+
+    }
+
+    #[test]
+    fn test_entity_apply_torque()
+    {
+
+    }
+    
+    #[test]
+    fn test_entity_update()
+    {
+
+    }
 }
