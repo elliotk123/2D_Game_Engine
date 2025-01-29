@@ -153,7 +153,7 @@ impl Div for Vector2
 }
 
 #[cfg(test)]
-mod vector2_tests 
+mod tests 
 {
     use super::*;
 

@@ -31,3 +31,42 @@ impl Particle
     }
 
 }
+#[cfg(test)]
+mod tests 
+{
+    use super::*;
+
+    #[test]
+    fn test_particle_new()
+    {
+        let p_test : Particle = Particle::new(Vector2::new(2.0,3.0), Vector2::new(0.5, 0.25), 1.5, 0.5);
+        assert_eq!(p_test.position,         Vector2::new(2.0, 3.0));
+        assert_eq!(p_test.linear_velocity,  Vector2::new(0.5, 0.25)); 
+        assert_eq!(p_test.angular_velocity, 1.5);
+        assert_eq!(p_test.orientation,      0.5);
+    }
+
+    #[test]
+    fn test_particle_update()
+    {
+        let mut p_test  : Particle = Particle::new(Vector2::new(0.0,0.0), Vector2::new(2.0, 3.0), 0.0, 0.0);
+        let mut delta_t : f32 = 1.0;
+        
+        p_test.update(delta_t, Vector2::new(1.0,1.0), 0.0);
+        
+        assert_eq!(p_test.position,         Vector2::new(2.5,3.5));
+        assert_eq!(p_test.linear_velocity,  Vector2::new(3.0, 4.0));
+        assert_eq!(p_test.angular_velocity, 0.0);
+        assert_eq!(p_test.orientation,      0.0);
+
+        p_test = Particle::new(Vector2::new(0.0,0.0), Vector2::new(0.0, 0.0), 1.0, 1.0);
+        delta_t = 3.0;
+
+        p_test.update(delta_t, Vector2::new(0.0,0.0), 1.0);
+        assert_eq!(p_test.position,         Vector2::new(0.0,0.0));
+        assert_eq!(p_test.linear_velocity,  Vector2::new(0.0,0.0));
+        assert_eq!(p_test.angular_velocity, 4.0);
+        assert_eq!(p_test.orientation,      8.5);
+
+    }
+}
