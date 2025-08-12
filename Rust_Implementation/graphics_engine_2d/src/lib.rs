@@ -1,5 +1,6 @@
 extern crate sdl3;
 
+use sdl3::render::FPoint;
 use sdl3::pixels::Color;
 use sdl3::event::Event;
 use sdl3::keyboard::Keycode;
@@ -21,10 +22,25 @@ pub fn graphics_main() {
     canvas.present();
     let mut event_pump = sdl_context.event_pump().unwrap();
     let mut i = 0;
+    
+            let points = [
+            FPoint::new(100.0, 100.0),
+            FPoint::new(200.0, 200.0),
+            FPoint::new(300.0, 100.0),
+            FPoint::new(400.0, 200.0),
+            FPoint::new(500.0, 100.0),
+            FPoint::new(600.0, 200.0),
+        ];
+
+
     'running: loop {
         i = (i + 1) % 255;
-        canvas.set_draw_color(Color::RGB(i, 64, 255 - i));
+        canvas.set_draw_color(Color::RGB(0, 0, 0));
         canvas.clear();
+
+        canvas.set_draw_color(Color::RGB(0, 255, 0));
+        canvas.draw_points(&points[..]).unwrap();
+
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit {..} |
@@ -47,7 +63,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let result = add(2, 2);
+        let result = 2 + 2;
         assert_eq!(result, 4);
     }
 }
