@@ -4,9 +4,11 @@ use sdl3::render::FPoint;
 use sdl3::pixels::Color;
 use sdl3::event::Event;
 use sdl3::keyboard::Keycode;
+use sdl3::video::Window;
+use sdl3::render::Canvas;
 use std::time::Duration;
 
-pub fn graphics_main() {
+pub fn init_graphics() ->  Result<Canvas<Window>, String>{
     let sdl_context = sdl3::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
 
@@ -20,42 +22,38 @@ pub fn graphics_main() {
     canvas.set_draw_color(Color::RGB(0, 255, 255));
     canvas.clear();
     canvas.present();
-    let mut event_pump = sdl_context.event_pump().unwrap();
-    let mut i = 0;
-    
-            let points = [
-            FPoint::new(100.0, 100.0),
-            FPoint::new(200.0, 200.0),
-            FPoint::new(300.0, 100.0),
-            FPoint::new(400.0, 200.0),
-            FPoint::new(500.0, 100.0),
-            FPoint::new(600.0, 200.0),
-        ];
 
-
-    'running: loop {
-        i = (i + 1) % 255;
-        canvas.set_draw_color(Color::RGB(0, 0, 0));
-        canvas.clear();
-
-        canvas.set_draw_color(Color::RGB(0, 255, 0));
-        canvas.draw_points(&points[..]).unwrap();
-
-        for event in event_pump.poll_iter() {
-            match event {
-                Event::Quit {..} |
-                Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
-                    break 'running
-                },
-                _ => {}
-            }
-        }
-        // The rest of the game loop goes here...
-
-        canvas.present();
-        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
-    }
+    Ok(canvas)
 }
+
+pub fn run_graphics(canvas : &mut Canvas<Window>, points: &[f32] ){
+    let points_converted: Vec<FPoint> = points
+        .chunks(2)
+        .map(|chunk| FPoint::new(chunk[0], chunk[1]))
+        .collect();
+
+    canvas.set_draw_color(Color::RGB(0, 0, 0));
+    canvas.clear();
+
+    canvas.set_draw_color(Color::RGB(0, 255, 0));
+    canvas.draw_points(&points_converted[..]).unwrap();
+
+    canvas.present();    
+}
+
+
+    // let mut event_pump = sdl_context.event_pump().unwrap();
+
+        // for event in event_pump.poll_iter() {
+        //     match event {
+        //         Event::Quit {..} |
+        //         Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
+        //             break 'running
+        //         },
+        //         _ => {}
+        //     }
+        // }
+
 
 #[cfg(test)]
 mod tests {

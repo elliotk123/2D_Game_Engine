@@ -1,11 +1,24 @@
 use physics_engine_2d::vector2::Vector2;
-use graphics_engine_2d::graphics_main;
+use graphics_engine_2d::init_graphics;
+use graphics_engine_2d::run_graphics;
+use std::time::Duration;
 
-fn main() {
-    println!("Hello, world!");
-    let v1 : Vector2 = Vector2::new(2.0,3.0);
-    let v2 : Vector2 = Vector2::new(1.0,8.0);
-    println!("{:?} + {:?} = {:?}",v1,v2,v1 + v2);
-    graphics_main();
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+
+    let points = [
+        100.0, 100.0,
+        200.0, 200.0,
+        300.0, 100.0,
+        400.0, 200.0,
+        500.0, 100.0,
+        600.0, 200.0,
+    ];
+
+    let mut canvas = init_graphics()?;
+
+    loop {
+        run_graphics(&mut canvas, &points);
+        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
+    }
 
 }
