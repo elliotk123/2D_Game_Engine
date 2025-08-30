@@ -1,0 +1,1 @@
+// This struct is responsible for rendering a pixel buffer to the screen. 
