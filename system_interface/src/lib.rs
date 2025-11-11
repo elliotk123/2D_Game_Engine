@@ -1,13 +1,13 @@
-mod SDL3;
+mod sdl03;
 mod common;
 
 use common::graphical_interface::{GraphicalInterface, GraphicsBackend};
 use common::keyboard_interface::{KeyboardInterface, KeyboardBackend};
-use SDL3::sdl3_backend::Sdl3Backend;
+use sdl03::sdl3_backend::Sdl3Backend;
 
-struct SystemInterface{
-    graphical_interface : GraphicalInterface,
-    keyboard_interface : KeyboardInterface
+pub struct SystemInterface{
+    pub graphical_interface : GraphicalInterface,
+    pub keyboard_interface : KeyboardInterface
 }
 
 
@@ -15,13 +15,13 @@ struct SystemInterface{
 pub fn init_system_interface() -> SystemInterface
 {
     // initilise any backends here that control multiple interfaces
-    let sdl3_backend = Sdl3Backend::new();
+    let sdl3_backend: Sdl3Backend = Sdl3Backend::new();
 
     // Create a graphical interface with the SDL3 graphics backend
-    let graphics_backends: Vec<Box<dyn GraphicsBackend>> = vec![Box::new(sdl3_backend)];
+    let graphics_backends: Vec<Box<dyn GraphicsBackend>> = vec![Box::new(sdl3_backend.graphics)];
     
     // Create a keyboard interface with the SDL3 keyboard backend
-    let keyboard_backends: Vec<Box<dyn KeyboardBackend>> = vec![Box::new(sdl3_backend)];
+    let keyboard_backends: Vec<Box<dyn KeyboardBackend>> = vec![Box::new(sdl3_backend.keyboard)];
 
     SystemInterface
     {

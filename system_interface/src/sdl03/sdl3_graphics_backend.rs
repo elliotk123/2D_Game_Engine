@@ -2,23 +2,24 @@ use crate::common;
 
 use sdl3::video::Window;
 use sdl3::surface::Surface;
-use sdl3::VideoSubsystem;
 use sdl3::pixels::PixelFormat;
 use sdl3::pixels::PixelFormatEnum;
+
+use super::sdl3_types::SdlStateShared;
 
 use common::graphical_interface::GraphicsBackend;
 
 pub struct Sdl3GraphicsBackend
 {
-    sdl_context : &sdl3::Sdl,
+    shared_sdl : SdlStateShared,
     windows : Vec<Window>,
     surfaces : Vec<Surface<'static>>,
 }
 impl Sdl3GraphicsBackend{
-    pub fn new(sdl_context : &sdl3::Sdl) -> Sdl3GraphicsBackend{
+    pub fn new(shared_sdl : SdlStateShared) -> Sdl3GraphicsBackend{
         Sdl3GraphicsBackend
         {
-            sdl_context,
+            shared_sdl,
             windows : Vec::new(),
             surfaces : Vec::new()
         }
@@ -29,8 +30,9 @@ impl Sdl3GraphicsBackend{
 impl GraphicsBackend for Sdl3GraphicsBackend
 {
     unsafe fn create_window(&mut self, width : u32, height : u32, name : &str) -> usize{
-        let video_subsystem: VideoSubsystem = self.sdl_context.video().unwrap();
-        let window : Window = video_subsystem.window(name, width, height)
+        // let video_subsystem: VideoSubsystem = self.shared_sdl.borrow_mut().context.video().unwrap();
+        let shared: std::cell::RefMut<'_, super::sdl3_types::SdlState> = self.shared_sdl.borrow_mut();
+        let window : Window = shared.video_subsystem.window(name, width, height)
             .position_centered()
             .build()
             .unwrap();
@@ -46,13 +48,14 @@ impl GraphicsBackend for Sdl3GraphicsBackend
 
     fn render(&mut self, pixel_buffer: &Vec<u8>, window_id : usize)
     {
+        let shared: std::cell::RefMut<'_, super::sdl3_types::SdlState> = self.shared_sdl.borrow_mut();
         // Copy pixel_buffer to surface
-        let surface = &mut self.surfaces[window_id];
-        surface.with_lock_mut(|buf| buf.copy_from_slice(pixel_buffer));
+        let surface: &mut Surface<'static> = &mut self.surfaces[window_id];
+        surface.with_lock_mut(|buf: &mut [u8]| buf.copy_from_slice(pixel_buffer));
 
         // Blit surface to window and update
-        let window = &self.windows[window_id];
-        window.surface().unwrap().blit(&surface, None, None).unwrap();
-        window.update_surface().unwrap();
+        let window_surface: &mut sdl3::video::WindowSurfaceRef<'_> = &mut self.windows[window_id].surface(&shared.event_pump).unwrap();
+        window_surface.blit(None, surface, None).unwrap();
+        window_surface.update_window().unwrap();
     }
 }
