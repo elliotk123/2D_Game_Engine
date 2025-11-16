@@ -1,7 +1,7 @@
 pub trait GraphicsBackend
 {
     fn render(&mut self, pixel_buffer: &Vec<u8>, window_id: usize);
-    unsafe fn create_window(&mut self, width: u32, height: u32, name : &str) -> usize;
+    fn create_window(&mut self, width: u32, height: u32, name : &str) -> usize;
 }
 pub struct GraphicalInterface
 {
@@ -18,7 +18,7 @@ impl GraphicalInterface
         }
     }
 
-    pub unsafe fn create_window(&mut self, width:u32, height:u32, name : &str, backend : usize) -> usize
+    pub fn create_window(&mut self, width:u32, height:u32, name : &str, backend : usize) -> usize
     {
         if backend  >= self.graphics_backends.len()
         {

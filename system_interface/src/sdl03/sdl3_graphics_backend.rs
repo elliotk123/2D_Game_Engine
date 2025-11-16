@@ -29,7 +29,7 @@ impl Sdl3GraphicsBackend{
 
 impl GraphicsBackend for Sdl3GraphicsBackend
 {
-    unsafe fn create_window(&mut self, width : u32, height : u32, name : &str) -> usize{
+    fn create_window(&mut self, width : u32, height : u32, name : &str) -> usize{
         // let video_subsystem: VideoSubsystem = self.shared_sdl.borrow_mut().context.video().unwrap();
         let shared: std::cell::RefMut<'_, super::sdl3_types::SdlState> = self.shared_sdl.borrow_mut();
         let window : Window = shared.video_subsystem.window(name, width, height)
@@ -38,7 +38,9 @@ impl GraphicsBackend for Sdl3GraphicsBackend
             .unwrap();
 
         let surface: Surface<'static> = Surface::new(width, height, 
-            PixelFormat::from_ll(PixelFormatEnum::ARGB8888.to_ll())).unwrap();
+            unsafe{
+                PixelFormat::from_ll(PixelFormatEnum::ARGB8888.to_ll())
+            }).unwrap();
 
         self.windows.push(window);
         self.surfaces.push(surface);

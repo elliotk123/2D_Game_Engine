@@ -44,7 +44,6 @@ impl Sdl3Backend
         let event_pump : sdl3::EventPump = context.event_pump().unwrap();
 
         let shared_data: SdlState = SdlState {
-            context,
             video_subsystem,
             event_pump
         };

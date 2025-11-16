@@ -5,7 +5,6 @@ use std::cell::RefCell;
 
 pub struct SdlState
 {
-    pub context : sdl3::Sdl,
     pub video_subsystem : sdl3::VideoSubsystem,
     pub event_pump : sdl3::EventPump
 }
