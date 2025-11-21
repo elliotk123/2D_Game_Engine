@@ -23,6 +23,9 @@ impl GraphicalInterface
         if backend  >= self.graphics_backends.len()
         {
             // Error, backend does not exist
+             eprintln!(
+                "Error: Backend ({}) doesn't exist!", 
+                       backend);
             return 0 as usize;
         }
         return self.graphics_backends[backend].create_window(width, height, name);

@@ -1,5 +1,5 @@
 mod sdl03;
-mod common;
+pub mod common;
 
 use common::graphical_interface::{GraphicalInterface, GraphicsBackend};
 use common::keyboard_interface::{KeyboardInterface, KeyboardBackend};
