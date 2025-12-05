@@ -18,7 +18,7 @@ impl PixelBuffer {
     }
 
     pub fn set_pixel(&mut self, x: usize, y: usize, colour: &[u8]){
-        if(y >= self.height || x >= self.width){
+        if y >= self.height || x >= self.width{
             return;
         }
         let index = ((self.height-y)*self.width + x)*self.bpp;

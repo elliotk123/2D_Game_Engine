@@ -44,16 +44,33 @@ fn main() {
     let mut system_interface = init_system_interface();
     let window = system_interface.graphical_interface.create_window(WIDTH as u32, HEIGHT as u32, "Physics Demo", 0);
 
+    let mut thrust = 0.0;
+    let mut torque_clock = 0.0;
+    let mut torque_anti_clock = 0.0;
     'running: loop {
         for event in system_interface.keyboard_interface.poll_events(){
-            match event {
-                MyKeyboardEvent::KeyDown(MyKey::Escape) => break 'running,
-                MyKeyboardEvent::KeyDown(MyKey::Space) => entity_list[0].apply_centerline_force(1000.0),
-                MyKeyboardEvent::KeyDown(MyKey::A) => entity_list[0].apply_torque(100.0),
-                MyKeyboardEvent::KeyDown(MyKey::D) => entity_list[0].apply_torque(-100.0),
-                _ => {}
+            if let MyKeyboardEvent::KeyDown(key) = event{
+                match key {
+                    MyKey::Escape => break 'running,
+                    MyKey::Space => thrust = 10.0,
+                    MyKey::A => torque_anti_clock = 10.0,
+                    MyKey::D => torque_clock = 10.0,
+                    _ => {}
+                }
+            }else if let MyKeyboardEvent::KeyUp(key) = event{
+                match key {
+                    MyKey::Space => thrust = 0.0,
+                    MyKey::A => torque_anti_clock = 0.0,
+                    MyKey::D => torque_clock = 0.0,
+                    _ => {}
+                }
             }
         }
+
+        entity_list[0].apply_centerline_force(thrust);
+        entity_list[0].apply_torque(-1.0*torque_clock);
+        entity_list[0].apply_torque(torque_anti_clock);
+        
 
         for ent in entity_list.iter_mut(){
             ent.update(1.0/60.0);
