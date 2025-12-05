@@ -31,6 +31,13 @@ impl Entity
         self.force_accumulator.push(force);
     }
 
+    pub fn apply_centerline_force(&mut self, force: f32)
+    {
+        self.force_accumulator.push(
+            Vector2 { x: (0.0), y: (force) }.rotate(self.particle.orientation)
+        )
+    }
+
 
     pub fn apply_torque( &mut self, torque: f32)
     {
