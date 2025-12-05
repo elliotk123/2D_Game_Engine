@@ -18,11 +18,8 @@ impl PixelBuffer {
     }
 
     pub fn set_pixel(&mut self, x: usize, y: usize, colour: &[u8]){
-        if(y >= self.height){
-            panic!("tried to access pixel {} on screen with height {}!",y,self.height);
-        }
-        if(x >= self.width){
-            panic!("tried to access pixel {} on screen with width {}!",x,self.width);
+        if(y >= self.height || x >= self.width){
+            return;
         }
         let index = ((self.height-y)*self.width + x)*self.bpp;
         for i in 0 .. self.bpp - 1{
