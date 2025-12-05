@@ -27,7 +27,7 @@ fn main() {
         Particle::new(
             Vector2 { x: (0.0), y: (0.0) },
             Vector2 { x: (3.0), y: (1.0) },
-            0.0,
+            0.5,
             0.0
         ),
         Shape::new([
@@ -48,6 +48,9 @@ fn main() {
         for event in system_interface.keyboard_interface.poll_events(){
             match event {
                 MyKeyboardEvent::KeyDown(MyKey::Escape) => break 'running,
+                MyKeyboardEvent::KeyDown(MyKey::Space) => entity_list[0].apply_centerline_force(1000.0),
+                MyKeyboardEvent::KeyDown(MyKey::A) => entity_list[0].apply_torque(100.0),
+                MyKeyboardEvent::KeyDown(MyKey::D) => entity_list[0].apply_torque(-100.0),
                 _ => {}
             }
         }
