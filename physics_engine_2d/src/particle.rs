@@ -6,7 +6,7 @@ pub struct Particle
     pub position     : Vector2,
     linear_velocity  : Vector2,
     angular_velocity : f32,
-    orientation      : f32
+    pub orientation  : f32
     
 }
 impl Particle

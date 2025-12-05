@@ -5,8 +5,8 @@ use crate::shape::{self, Shape};
 #[derive(Debug, Clone)]
 pub struct Entity
 {
-    particle           : Particle,
-    shape              : Shape,
+    pub particle       : Particle,
+    pub shape          : Shape,
     mass               : f32,
     moment_of_inertia  : f32,
     force_accumulator  : Vec<Vector2>,
