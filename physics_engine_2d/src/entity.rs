@@ -5,8 +5,8 @@ use crate::shape::{self, Shape};
 #[derive(Debug, Clone)]
 pub struct Entity
 {
-    particle           : Particle,
-    shape              : Shape,
+    pub particle       : Particle,
+    pub shape          : Shape,
     mass               : f32,
     moment_of_inertia  : f32,
     force_accumulator  : Vec<Vector2>,
@@ -29,6 +29,13 @@ impl Entity
     pub fn apply_force(&mut self, force:Vector2)
     {
         self.force_accumulator.push(force);
+    }
+
+    pub fn apply_centerline_force(&mut self, force: f32)
+    {
+        self.force_accumulator.push(
+            Vector2 { x: (0.0), y: (force) }.rotate(self.particle.orientation)
+        )
     }
 
 

@@ -31,15 +31,17 @@ impl KeyboardBackend for Sdl3KeyboardBackend
                 Event::KeyDown { keycode: Some(keycode), repeat, .. } => {
                     if !repeat {
                         // Ignore key repeat events
-                        let my_key: MyKey = MyKey::try_from(keycode as i32).unwrap();
-                        let my_event: MyKeyboardEvent = MyKeyboardEvent::KeyDown(my_key);
-                        my_event_queue.push(my_event);
+                        if let Ok(my_key) = MyKey::try_from(keycode as i32){
+                            let my_event: MyKeyboardEvent = MyKeyboardEvent::KeyDown(my_key);
+                            my_event_queue.push(my_event);
+                        };
                     }
                 },
                 Event::KeyUp { keycode: Some(keycode), .. } => {
-                    let my_key: MyKey = MyKey::try_from(keycode as i32).unwrap();
-                    let my_event: MyKeyboardEvent = MyKeyboardEvent::KeyUp(my_key);
-                    my_event_queue.push(my_event);
+                    if let Ok(my_key) = MyKey::try_from(keycode as i32){
+                        let my_event: MyKeyboardEvent = MyKeyboardEvent::KeyUp(my_key);
+                        my_event_queue.push(my_event);
+                    }
                 },
                 _ => {}
             }

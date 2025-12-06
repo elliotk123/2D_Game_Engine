@@ -4,7 +4,7 @@ use crate::vector2::Vector2;
 #[derive(Debug, Clone)]
 pub struct Shape
 {
-    vertices    : Vec<Vector2>
+    pub vertices    : Vec<Vector2>
 }
 impl Shape
 {
