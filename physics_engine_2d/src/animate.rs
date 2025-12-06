@@ -8,7 +8,8 @@ pub fn animate(
     entity_list: &Vec<Entity>, 
     pix_x: usize, pix_y: usize, 
     phys_x: usize, phys_y: usize, 
-    phys_origin: Vector2
+    phys_origin: Vector2,
+    iso : bool
 )
 {
     let conversion = Vector2::new(
@@ -21,11 +22,24 @@ pub fn animate(
             let particle_vec: Vector2 = (
                 vertex.rotate(e.particle.orientation) + 
                 e.particle.position - phys_origin)*conversion;
-            buffer.set_pixel(
-                particle_vec.x.round() as usize, 
-                particle_vec.y.round() as usize, 
-                &[255,0,0,255]
-            );
+            let iso_vec : Vector2 = Vector2 { 
+                x: (particle_vec.x - particle_vec.y), 
+                y: (particle_vec.x/2.0 + particle_vec.y/2.0) 
+            };
+            if !iso {
+                buffer.set_pixel(
+                    particle_vec.x.round() as usize, 
+                    particle_vec.y.round() as usize, 
+                    &[255,0,0,255]
+                );
+            }else{
+                buffer.set_pixel(
+                    iso_vec.x.round() as usize, 
+                    iso_vec.y.round() as usize, 
+                    &[255,0,0,255]
+                );
+            }
+        
         }
     }
 }

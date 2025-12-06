@@ -83,7 +83,8 @@ fn main() {
             &entity_list, 
             WIDTH, HEIGHT, 
             100, 50, 
-            Vector2 { x: (-50.0), y: (-25.0) }
+            Vector2 { x: (-50.0), y: (-25.0) },
+            true
         );
 
         system_interface.graphical_interface.render_to_window(&pixel_buffer.pixel_data, window, 0);
