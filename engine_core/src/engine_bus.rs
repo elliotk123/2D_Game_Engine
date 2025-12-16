@@ -1,6 +1,7 @@
 use crossbeam::channel::{Sender, Receiver, bounded};
 
 const BUS_BUFFER_LENGTH : usize = 2;
+
 enum LogicToPhysicsChannel{
     AddEntity{
         mass : f64,
@@ -17,6 +18,15 @@ enum LogicToPhysicsChannel{
         index : usize
     }
 }
+
+enum LogicToCompositor{
+    BackgroundTexture,
+    Camera{
+        posx : f64,
+        posy : f64
+    },
+    SpriteEntityMap
+}
 enum PhysicsToLogicChannel{
     Collision{
         index_a : usize,
@@ -29,15 +39,27 @@ enum PhysicsToLogicChannel{
 }
 
 enum PhysicsToCompositorChannel{
-    PositionUpdate{
+    Position{
         index : usize,
         x : f64,
         y : f64
     },
-    OrientationUpdate{
+    Orientation{
         index : usize,
         orientation : f64
     }
+}
+
+enum CompositorToSysOut{
+    PixelBuffer{
+        data : Vec<u8>
+    }
+}
+
+enum SysInToGameLogic{
+    KeyboardEvents,
+    MouseEvents,
+    TouchEvents
 }
 
 struct Channel<T>{ 
