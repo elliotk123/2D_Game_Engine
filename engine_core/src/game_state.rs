@@ -16,17 +16,17 @@ impl GameState{
     {
         GameState { 
             physics_2d: PhysicsModule::new(), 
-            compositor_2d: () 
+            compositor_2d: CompositorModule::new()
         }
     }
 
 
-    pub fn run(&mut self, module_id : &ModuleId)
+    pub fn run(&mut self, module_id : ModuleId)
     {
-        match self.modules.get_mut(module_id)
+        match module_id
         {
-            Some(module) => {module.run();}
-            None => {println!("module not found");}
+            ModuleId::PHYS2D => {self.physics_2d.run()}
+            ModuleId::COMP2D => {self.compositor_2d.run()}
         }
     }
 }
