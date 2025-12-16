@@ -1,0 +1,9 @@
+[package]
+name = "engine_core"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+crossbeam = "0.8"
+physics_engine_2d = {path = "../physics_engine_2d"}
+graphics_compisotor_2d = {path = "../graphics_compisotor_2d"}

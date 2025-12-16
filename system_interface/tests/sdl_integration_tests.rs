@@ -1,5 +1,3 @@
-use std::thread;
-use std::time::Duration;
 use system_interface::init_system_interface;
 use system_interface::common::keyboard_interface::{MyKey, MyKeyboardEvent};
 

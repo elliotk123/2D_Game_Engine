@@ -4,10 +4,6 @@ use physics_engine_2d::vector2::Vector2;
 use physics_engine_2d::shape::Shape;
 use physics_engine_2d::animate::animate;
 use inter_module_comms::pixel_buffer::PixelBuffer;
-use engine_core::{
-    scheduler::Scheduler,
-    engine_module::ModuleId
-};
 use system_interface::{
     init_system_interface,
     common::keyboard_interface::{MyKey, MyKeyboardEvent }
@@ -16,15 +12,14 @@ use system_interface::{
 use std::time::Duration;
 
 fn main() {
-    let schedule: Vec<Vec<Module_Id>> = vec![
-        vec![SYSIN,LOGIC,PHYS2D,COMP2D,SYSOUT]
-    ];
 
-    let minor_cycle : u64 = 16667;
-    let scheduler = Scheduler::new(minor_cycle, schedule);
-    
     const WIDTH : usize= 1000;
     const HEIGHT : usize = 500;
+
+
+    let mut pixel_buffer = PixelBuffer::new(
+        1000, 500, 4, &[0, 0, 0, 255]
+    );
 
     let mut entity_list:Vec<Entity> = Vec::new();
 
