@@ -1,5 +1,5 @@
 [package]
-name = "graphics_compisotor_2d"
+name = "graphics_compositor_2d"
 version = "0.1.0"
 edition = "2021"
 

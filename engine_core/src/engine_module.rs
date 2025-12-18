@@ -1,3 +1,5 @@
+use super::engine_bus::EngineBus;
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ModuleId{
     PHYS2D = 1,
@@ -8,5 +10,5 @@ pub enum ModuleId{
 }
 
 pub trait EngineModule {
-    fn run(&mut self);
+    fn run(&mut self, &mut bus : EngineBus);
 }
