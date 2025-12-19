@@ -1,15 +1,14 @@
 use super::entity::Entity;
 use engine_common::{engine_bus::EngineBus, engine_module::EngineModule};
 
-struct PhysicsModule {
+pub struct PhysicsModule {
     entities : Vec<Entity>,
     delta_t_s : f32,
-    
 }
 
 impl PhysicsModule
 {
-    fn new(delta_t : f32, )->PhysicsModule
+    pub fn new(delta_t : f32, )->PhysicsModule
     {
         PhysicsModule
         {

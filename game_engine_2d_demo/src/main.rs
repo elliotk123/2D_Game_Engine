@@ -4,10 +4,9 @@ use physics_engine_2d::vector2::Vector2;
 use physics_engine_2d::shape::Shape;
 use physics_engine_2d::animate::animate;
 use inter_module_comms::pixel_buffer::PixelBuffer;
-use engine_core::{
-    scheduler::Scheduler,
-    engine_module::ModuleId
-};
+use engine_core::scheduler::Scheduler;
+use engine_common::engine_module::ModuleId;
+
 use system_interface::{
     init_system_interface,
     common::keyboard_interface::{MyKey, MyKeyboardEvent }
