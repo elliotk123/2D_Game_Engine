@@ -1,5 +1,5 @@
 use system_interface::{init_system_interface, SystemInterface};
-use super::engine_bus::EngineBus;
+use engine_common::engine_bus::EngineBus;
 
 struct EngineIO {
     system_interface : SystemInterface

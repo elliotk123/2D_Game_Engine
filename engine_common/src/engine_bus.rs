@@ -1,6 +1,4 @@
-use crossbeam::channel::{Sender, Receiver, bounded};
-
-const BUS_BUFFER_LENGTH : usize = 2;
+use crossbeam::channel::{Sender, Receiver, unbounded};
 
 enum LogicToPhysicsChannel{
     AddEntity{
@@ -19,7 +17,7 @@ enum LogicToPhysicsChannel{
     }
 }
 
-enum LogicToCompositor{
+enum LogicToCompositorChannel{
     BackgroundTexture,
     Camera{
         posx : f64,
@@ -53,13 +51,13 @@ enum PhysicsToCompositorChannel{
     }
 }
 
-enum CompositorToSysOut{
+enum CompositorToSysOutChannel{
     PixelBuffer{
         data : Vec<u8>,
     }
 }
 
-enum SysInToGameLogic{
+enum SysInToGameLogicChannel{
     KeyboardEvents,
     MouseEvents,
     TouchEvents
@@ -71,21 +69,21 @@ struct Channel<T>{
 }
 pub struct EngineBus{
     logic_to_physics : Channel<LogicToPhysicsChannel>,
-    logic_to_compositor : Channel<LogicToCompositor>,
+    logic_to_compositor : Channel<LogicToCompositorChannel>,
     physics_to_logic : Channel<PhysicsToLogicChannel>,
     physics_to_compositor : Channel<PhysicsToCompositorChannel>,
-    compositor_to_sysout : Channel<CompositorToSysOut>,
-    sysin_to_logic : Channel<SysInToGameLogic>
+    compositor_to_sysout : Channel<CompositorToSysOutChannel>,
+    sysin_to_logic : Channel<SysInToGameLogicChannel>
 }
 
 impl EngineBus{
     fn new(&mut self)
     {
-        (self.logic_to_physics.tx, self.logic_to_physics.rx) = bounded::<LogicToPhysicsChannel>(BUS_BUFFER_LENGTH);
-        (self.logic_to_compositor.tx, self.logic_to_compositor.rx) = bounded::<LogicToCompositorChannel>(BUS_BUFFER_LENGTH);
-        (self.physics_to_logic.tx, self.physics_to_logic.rx) = bounded::<PhysicsToLogicChannel>(BUS_BUFFER_LENGTH);
-        (self.physics_to_compositor.tx, self.physics_to_compositor.rx) = bounded::<PhysicsToCompositorChannel>(BUS_BUFFER_LENGTH);
-        (self.compositor_to_sysout.tx, self.compositor_to_sysout.rx) = bounded::<CompositorToSysOut>(BUS_BUFFER_LENGTH);
-        (self.sysin_to_logic.tx, self.sysin_to_logic.rx) = bounded::<SysInToGameLogic>(BUS_BUFFER_LENGTH);
+        (self.logic_to_physics.tx, self.logic_to_physics.rx) = unbounded::<LogicToPhysicsChannel>();
+        (self.logic_to_compositor.tx, self.logic_to_compositor.rx) = unbounded::<LogicToCompositorChannel>();
+        (self.physics_to_logic.tx, self.physics_to_logic.rx) = unbounded::<PhysicsToLogicChannel>();
+        (self.physics_to_compositor.tx, self.physics_to_compositor.rx) = unbounded::<PhysicsToCompositorChannel>();
+        (self.compositor_to_sysout.tx, self.compositor_to_sysout.rx) = unbounded::<CompositorToSysOutChannel>();
+        (self.sysin_to_logic.tx, self.sysin_to_logic.rx) = unbounded::<SysInToGameLogicChannel>();
     }
 }
