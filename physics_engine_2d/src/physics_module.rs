@@ -1,5 +1,5 @@
 use super::entity::Entity;
-use engine_core::engine_module::EngineModule;
+use engine_common::{engine_bus::EngineBus, engine_module::EngineModule};
 
 struct PhysicsModule {
     entities : Vec<Entity>,
@@ -22,9 +22,9 @@ impl PhysicsModule
 
 impl EngineModule for PhysicsModule
 {
-    fn run(&self)
+    fn run(&mut self, bus : &mut EngineBus)
     {
-        for entity in self.entities.iter()
+        for entity in self.entities.iter_mut()
         {
             entity.update(self.delta_t_s);
         }
