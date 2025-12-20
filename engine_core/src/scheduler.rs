@@ -1,7 +1,6 @@
 use std::time::{Duration, Instant};
-use std::thread::sleep;
 
-use super::engine_module::ModuleId;
+use engine_common::engine_module::ModuleId;
 use super::game_state::GameState;
 
 pub struct Scheduler {
@@ -24,7 +23,7 @@ impl Scheduler{
             let minor_cycle_start_time = Instant::now(); 
             for task in minor_cycle.iter()
             {
-                game.run(task);
+                game.run(task.clone());
             }
             let minor_cycle_duration : Duration = minor_cycle_start_time.elapsed();
             if minor_cycle_duration > self.minor_cycle_dur

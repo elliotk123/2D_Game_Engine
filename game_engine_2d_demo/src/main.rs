@@ -15,8 +15,8 @@ use system_interface::{
 use std::time::Duration;
 
 fn main() {
-    let schedule: Vec<Vec<Module_Id>> = vec![
-        vec![SYSIN,LOGIC,PHYS2D,COMP2D,SYSOUT]
+    let schedule: Vec<Vec<ModuleId>> = vec![
+        vec![ModuleId::SYSIN,ModuleId::LOGIC, ModuleId::PHYS2D, ModuleId::COMP2D, ModuleId::SYSOUT]
     ];
 
     let minor_cycle : u64 = 16667;
