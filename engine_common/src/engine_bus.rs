@@ -1,4 +1,5 @@
 use crossbeam::channel::{Sender, Receiver, unbounded};
+use inter_module_comms::pixel_buffer::PixelBuffer;
 use system_interface::common::keyboard_interface::{MyKeyboardEvent, MyKey};
 
 pub enum LogicToPhysicsChannel{
@@ -18,7 +19,7 @@ pub enum LogicToPhysicsChannel{
     }
 }
 
-pub enum LogicToCompositorChannel{
+pub enum LogicToRenderSyncChannel{
     BackgroundTexture,
     Camera{
         posx : f64,
@@ -29,6 +30,7 @@ pub enum LogicToCompositorChannel{
         dots : Vec<f64>
     }
 }
+
 pub enum PhysicsToLogicChannel{
     Collision{
         index_a : usize,
@@ -40,7 +42,7 @@ pub enum PhysicsToLogicChannel{
     }
 }
 
-pub enum PhysicsToCompositorChannel{
+pub enum PhysicsToRenderSyncChannel{
     Position{
         index : usize,
         x : f64,
@@ -52,10 +54,16 @@ pub enum PhysicsToCompositorChannel{
     }
 }
 
-pub enum CompositorToSysOutChannel{
-    PixelBuffer{
-        data : Vec<u8>,
-    }
+pub enum CompositorToSysOutCommand{
+    Frame(PixelBuffer)
+}
+
+pub enum RenderCommand{
+    Pixel {
+        x: i32,
+        y: i32,
+        rgba: [u8; 4],
+    },
 }
 
 pub enum SysInToGameLogicChannel{
@@ -72,21 +80,34 @@ pub struct Channel<T>{
 }
 pub struct EngineBus{
     pub logic_to_physics : Channel<LogicToPhysicsChannel>,
-    pub logic_to_compositor : Channel<LogicToCompositorChannel>,
+    pub logic_to_renderer : Channel<LogicToRenderSyncChannel>,
     pub physics_to_logic : Channel<PhysicsToLogicChannel>,
-    pub physics_to_compositor : Channel<PhysicsToCompositorChannel>,
-    pub compositor_to_sysout : Channel<CompositorToSysOutChannel>,
+    pub physics_to_renderer : Channel<PhysicsToRenderSyncChannel>,
+    pub renderer_to_compositor : Channel<RenderCommand>,
+    pub compositor_to_sysout : Channel<CompositorToSysOutCommand>,
     pub sysin_to_logic : Channel<SysInToGameLogicChannel>
 }
 
 impl EngineBus{
-    pub fn new(&mut self)
+    pub fn new() -> EngineBus
     {
-        (self.logic_to_physics.tx, self.logic_to_physics.rx) = unbounded::<LogicToPhysicsChannel>();
-        (self.logic_to_compositor.tx, self.logic_to_compositor.rx) = unbounded::<LogicToCompositorChannel>();
-        (self.physics_to_logic.tx, self.physics_to_logic.rx) = unbounded::<PhysicsToLogicChannel>();
-        (self.physics_to_compositor.tx, self.physics_to_compositor.rx) = unbounded::<PhysicsToCompositorChannel>();
-        (self.compositor_to_sysout.tx, self.compositor_to_sysout.rx) = unbounded::<CompositorToSysOutChannel>();
-        (self.sysin_to_logic.tx, self.sysin_to_logic.rx) = unbounded::<SysInToGameLogicChannel>();
+        let (logic_to_physics_tx, logic_to_physics_rx) = unbounded::<LogicToPhysicsChannel>();
+        let (logic_to_renderer_tx, logic_to_renderer_rx) = unbounded::<LogicToRenderSyncChannel>();
+        let (physics_to_logic_tx, physics_to_logic_rx) = unbounded::<PhysicsToLogicChannel>();
+        let (physics_to_renderer_tx, physics_to_renderer_rx) = unbounded::<PhysicsToRenderSyncChannel>();
+        let (renderer_to_compositor_tx, renderer_to_compositor_rx) = unbounded::<RenderCommand>();
+        let (compositor_to_sysout_tx, compositor_to_sysout_rx) = unbounded::<CompositorToSysOutCommand>();
+        let (sysin_to_logic_tx, sysin_to_logic_rx) = unbounded::<SysInToGameLogicChannel>();
+
+        EngineBus
+        {
+            logic_to_physics        : Channel { tx:logic_to_physics_tx,       rx:logic_to_physics_rx },
+            logic_to_renderer       : Channel { tx:logic_to_renderer_tx,      rx:logic_to_renderer_rx },
+            physics_to_logic        : Channel { tx:physics_to_logic_tx,       rx:physics_to_logic_rx },
+            physics_to_renderer     : Channel { tx:physics_to_renderer_tx,    rx:physics_to_renderer_rx },
+            renderer_to_compositor  : Channel { tx:renderer_to_compositor_tx, rx:renderer_to_compositor_rx },
+            compositor_to_sysout    : Channel { tx:compositor_to_sysout_tx,   rx:compositor_to_sysout_rx },
+            sysin_to_logic          : Channel { tx:sysin_to_logic_tx,         rx:sysin_to_logic_rx },
+        }
     }
 }
