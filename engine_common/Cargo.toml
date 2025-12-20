@@ -5,5 +5,4 @@ edition = "2021"
 
 [dependencies]
 crossbeam = "0.8"
-system_interface = {"../system_interface}
-
+system_interface = {path = "../system_interface"}
