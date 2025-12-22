@@ -1,7 +1,7 @@
 use super::entity::Entity;
 use super::particle::Particle;
 use super::shape::Shape;
-use super::vector2::Vector2;
+use engine_math::vector2::Vector2;
 
 use engine_common::{
     engine_bus::{

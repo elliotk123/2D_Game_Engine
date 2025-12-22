@@ -1,4 +1,4 @@
-use crate::vector2::Vector2;
+use engine_math::vector2::Vector2;
 
 #[derive(Debug, Clone)]
 pub struct Shape

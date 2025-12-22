@@ -13,10 +13,9 @@ use engine_common::
     },
 };
 
-struct RenderSyncModule {
+pub struct RenderSyncModule {
     camera: Camera,
     entities: HashMap<usize, RenderEntity>,
-    default_entity:RenderEntity,
 }
 
 impl RenderSyncModule{
@@ -24,7 +23,6 @@ impl RenderSyncModule{
         Self {
             camera: Camera {x:0.0,y:0.0},
             entities: HashMap::new(),
-            default_entity: RenderEntity::new()
         }
     }
 }

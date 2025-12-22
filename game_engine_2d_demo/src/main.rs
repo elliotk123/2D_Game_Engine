@@ -6,9 +6,10 @@ fn main() {
         vec![
             ModuleId::SYSIN,
             ModuleId::LOGIC, 
-            ModuleId::PHYS2D,
+            ModuleId::PHYS2D, 
+            ModuleId::RENDER,
             ModuleId::COMP2D, 
-            ModuleId::SYSOUT
+            ModuleId::SYSOUT,
         ]
     ];
 

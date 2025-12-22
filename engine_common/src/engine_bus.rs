@@ -1,7 +1,6 @@
 use crossbeam::channel::{Sender, Receiver, unbounded};
-use engine_math::vector2::Vector2;
 use inter_module_comms::pixel_buffer::PixelBuffer;
-use system_interface::common::keyboard_interface::{MyKeyboardEvent, MyKey};
+use system_interface::common::keyboard_interface::{MyKeyboardEvent};
 
 pub enum LogicToPhysicsChannel{
     AddEntity{

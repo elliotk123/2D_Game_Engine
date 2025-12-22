@@ -6,7 +6,8 @@ pub enum ModuleId{
     COMP2D = 2,
     SYSIN  = 3,
     SYSOUT = 4,
-    LOGIC = 5
+    LOGIC  = 5,
+    RENDER = 6,
 }
 
 pub trait EngineModule {

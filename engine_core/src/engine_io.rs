@@ -1,7 +1,7 @@
 use system_interface::{init_system_interface, SystemInterface};
 use engine_common::engine_bus::{
     EngineBus,
-    CompositorToSysOutChannel,
+    CompositorToSysOutCommand,
     SysInToGameLogicChannel
 };
 use engine_common::engine_module::EngineIoModule;
@@ -26,8 +26,8 @@ impl EngineIO{
 impl EngineIoModule for EngineIO{
     fn write_output(&mut self, bus : &mut EngineBus){
         match bus.compositor_to_sysout.rx.recv().unwrap(){
-            CompositorToSysOutChannel::PixelBuffer {data} => {
-                self.system_interface.graphical_interface.render_to_window(&data, 0, 0);
+            CompositorToSysOutCommand::Frame (data) => {
+                self.system_interface.graphical_interface.render_to_window(&data.pixel_data, 0, 0);
             }
         }
             
