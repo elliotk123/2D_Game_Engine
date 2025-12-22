@@ -1,5 +1,5 @@
 # Project architecture roughly
-
+```
 engine_core
  ├─ creates modules
  │    ├─ systemin
@@ -38,7 +38,7 @@ engine_core
       ├─ render_sync.run()
       ├─ compositor.run()
       └─ systemout.run()
-
+```
 
 
 
