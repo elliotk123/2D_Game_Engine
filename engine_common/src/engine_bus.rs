@@ -5,18 +5,27 @@ use system_interface::common::keyboard_interface::{MyKeyboardEvent, MyKey};
 
 pub enum LogicToPhysicsChannel{
     AddEntity{
-        mass : f64,
-        moi : f64,
-        posx : f64,
-        posy : f64,
-        velx : f64,
-        vely : f64,
-        orien : f64,
-        angvel : f64,
-        shape : Vec<f64>
+        mass : f32,
+        moi : f32,
+        posx : f32,
+        posy : f32,
+        velx : f32,
+        vely : f32,
+        orien : f32,
+        angvel : f32,
+        shape : Vec<f32>
     },
     RemoveEntity{
         index : usize
+    },
+    ApplyForce{
+        index : usize,
+        forcex : f32,
+        forcey : f32
+    },
+    ApplyTorque{
+        index : usize,
+        torque : f32
     }
 }
 
