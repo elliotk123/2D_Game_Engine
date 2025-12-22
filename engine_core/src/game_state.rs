@@ -17,10 +17,10 @@ pub struct GameState {
 }
 
 impl GameState{
-    pub fn new(engine_bus : EngineBus, delta_t_s : f32) -> GameState
+    pub fn new(delta_t_s : f32) -> GameState
     {
         GameState { 
-            engine_bus,
+            engine_bus : EngineBus::new(),
             physics_2d: PhysicsModule::new(delta_t_s), 
             compositor_2d: CompositorModule::new(),
             engine_io : EngineIO::new(),
