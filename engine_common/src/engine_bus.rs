@@ -89,13 +89,21 @@ pub struct EngineBus{
 }
 
 impl EngineBus{
-    pub fn new(&mut self)
+    pub fn new() -> Self
     {
-        (self.logic_to_physics.tx, self.logic_to_physics.rx) = unbounded::<LogicToPhysicsChannel>();
-        (self.logic_to_compositor.tx, self.logic_to_compositor.rx) = unbounded::<LogicToCompositorChannel>();
-        (self.physics_to_logic.tx, self.physics_to_logic.rx) = unbounded::<PhysicsToLogicChannel>();
-        (self.physics_to_compositor.tx, self.physics_to_compositor.rx) = unbounded::<PhysicsToCompositorChannel>();
-        (self.compositor_to_sysout.tx, self.compositor_to_sysout.rx) = unbounded::<CompositorToSysOutChannel>();
-        (self.sysin_to_logic.tx, self.sysin_to_logic.rx) = unbounded::<SysInToGameLogicChannel>();
+        let (lp_tx, lp_rx) = unbounded::<LogicToPhysicsChannel>();
+        let (lc_tx, lc_rx) = unbounded::<LogicToCompositorChannel>();
+        let (pl_tx, pl_rx) = unbounded::<PhysicsToLogicChannel>();
+        let (pc_tx, pc_rx) = unbounded::<PhysicsToCompositorChannel>();
+        let (cs_tx, cs_rx) = unbounded::<CompositorToSysOutChannel>();
+        let (sl_tx, sl_rx) = unbounded::<SysInToGameLogicChannel>();
+        EngineBus {
+            logic_to_physics: Channel { tx: lp_tx, rx: lp_rx },
+            logic_to_compositor: Channel { tx: lc_tx, rx: lc_rx },
+            physics_to_logic: Channel { tx: pl_tx, rx: pl_rx },
+            physics_to_compositor: Channel { tx: pc_tx, rx: pc_rx },
+            compositor_to_sysout: Channel { tx: cs_tx, rx: cs_rx },
+            sysin_to_logic: Channel { tx: sl_tx, rx: sl_rx },
+        }
     }
 }
