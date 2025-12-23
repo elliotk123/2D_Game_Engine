@@ -1,6 +1,6 @@
 use crate::vector2::Vector2;
-use crate::particle::{self, Particle};
-use crate::shape::{self, Shape};
+use crate::particle::{Particle};
+use crate::shape::{Shape};
 
 #[derive(Debug, Clone)]
 pub struct Entity
@@ -58,7 +58,7 @@ impl Entity
             total_torque += self.torque_accumulator.pop().unwrap();
         }
 
-        self.particle.update(delta_t, total_force, total_torque)
+        self.particle.update(delta_t, total_force.scale(1.0/self.mass), total_torque/self.moment_of_inertia);
     }
 
 }

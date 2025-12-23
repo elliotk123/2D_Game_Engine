@@ -18,10 +18,16 @@ pub fn init_system_interface() -> SystemInterface
     let sdl3_backend: Sdl3Backend = Sdl3Backend::new();
 
     // Create a graphical interface with the SDL3 graphics backend
-    let graphics_backends: Vec<Box<dyn GraphicsBackend>> = vec![Box::new(sdl3_backend.graphics)];
+    let graphics_backends: Vec<Box<dyn GraphicsBackend>> = vec!
+    [
+        Box::new(sdl3_backend.graphics)
+    ];
     
     // Create a keyboard interface with the SDL3 keyboard backend
-    let keyboard_backends: Vec<Box<dyn KeyboardBackend>> = vec![Box::new(sdl3_backend.keyboard)];
+    let keyboard_backends: Vec<Box<dyn KeyboardBackend>> = vec!
+    [
+        Box::new(sdl3_backend.keyboard)
+    ];
 
     SystemInterface
     {
