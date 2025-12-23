@@ -39,7 +39,7 @@ engine_core
       ├─ compositor.run()
       └─ systemout.run()
 ```
-
+https://docs.google.com/document/d/1PqMXxeW0Y4neqJDc614b3k0hgaX-AcTvIxUSHublEgI/edit?usp=drivesdk
 
 
 # Instructions for ubuntu 
