@@ -4,12 +4,12 @@ pub trait KeyboardBackend
 
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum MyKeyboardEvent {
     KeyDown(MyKey),
     KeyUp(MyKey),
 }
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 pub enum MyKey {
     A = 97,              // SDLK_a
     B = 98,              // SDLK_b
