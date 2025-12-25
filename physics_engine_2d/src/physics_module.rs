@@ -78,6 +78,11 @@ impl PhysicsModule
                         }
                     );
                 },
+                LogicToPhysicsChannel::ApplyCenterlineForce { 
+                    index, force 
+                } => {
+                    self.entities[index].apply_centerline_force(force);
+                }
                 LogicToPhysicsChannel::ApplyTorque { 
                     index, 
                     torque 

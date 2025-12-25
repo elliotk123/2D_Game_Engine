@@ -2,6 +2,7 @@ use crossbeam::channel::{Sender, Receiver, unbounded};
 use inter_module_comms::pixel_buffer::PixelBuffer;
 use system_interface::common::keyboard_interface::{MyKeyboardEvent};
 
+#[derive(Debug, Clone)]
 pub enum LogicToPhysicsChannel{
     AddEntity{
         mass : f32,
@@ -22,12 +23,17 @@ pub enum LogicToPhysicsChannel{
         forcex : f32,
         forcey : f32
     },
+    ApplyCenterlineForce{
+        index : usize,
+        force : f32
+    },
     ApplyTorque{
         index : usize,
         torque : f32
     }
 }
 
+#[derive(Debug, Clone)]
 pub enum LogicToRenderSyncChannel{
     BackgroundTexture,
     Camera{
@@ -44,7 +50,7 @@ pub enum LogicToRenderSyncChannel{
         colour_id: u16
     }
 }
-
+#[derive(Debug, Clone)]
 pub enum PhysicsToLogicChannel{
     Collision{
         index_a : usize,
