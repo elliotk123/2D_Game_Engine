@@ -6,7 +6,7 @@ use engine_common::{
 use super::game_logic_io::{GameLogicInputs, GameLogicOutputs};
 use super::game_logic_conf::{GameLogicState, process};
 
-
+#[derive(Debug, Clone)]
 pub struct GameLogicModule{
     inputs :GameLogicInputs,
     state_data : GameLogicState,
@@ -40,22 +40,17 @@ impl GameLogicModule{
             }
         }
         for msg in bus.physics_to_logic.rx.try_iter(){
-            match msg{
-                PhysicsToLogicChannel::Collision 
-                { 
-                    index_a, index_b, 
-                    pocx, pocy, angle, 
-                    depth 
-                }=>
-                {
-                    self.inputs.collision_events += 1;
-                }
-            }
-        }       
+            self.inputs.physics_events.push(msg);
+        }     
     }
 
-    fn write_output_messages(&mut self, bus: &mut EngineBus){
-
+    fn write_output_messages(&self, bus: &mut EngineBus){
+        for msg in self.outputs.physics_commands.iter(){
+            bus.logic_to_physics.tx.send(msg.clone());
+        }
+        for msg in self.outputs.render_sync_commands.iter(){
+            bus.logic_to_render_sync.tx.send(msg.clone());
+        }
     }
 }
 
