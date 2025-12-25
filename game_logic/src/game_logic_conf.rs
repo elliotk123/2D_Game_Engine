@@ -1,8 +1,14 @@
 use super::game_logic_io::{GameLogicInputs, GameLogicOutputs};
 use system_interface::common::keyboard_interface::{MyKeyboardEvent, MyKey};
-use engine_common::engine_bus::LogicToPhysicsChannel;
+use engine_common::engine_bus::{LogicToPhysicsChannel, LogicToRenderSyncChannel};
 
-const SHAPE : [f32 ; 6] = [
+const SHAPE64 : [f64 ; 6] = [
+    0.0, 1.0,
+    -0.5, -0.5,
+    0.5, -0.5
+];
+
+const SHAPE32 : [f32 ; 6] = [
     0.0, 1.0,
     -0.5, -0.5,
     0.5, -0.5
@@ -36,7 +42,14 @@ fn initialise(input : GameLogicInputs, state : &mut GameLogicState, output : & m
             posx: 0.0, posy: 0.0, 
             velx: 0.0, vely: 0.0, 
             orien: 0.0, angvel: 0.0, 
-            shape: SHAPE.to_vec()
+            shape: SHAPE32.to_vec()
+        }
+    );
+    output.render_sync_commands.push(
+        LogicToRenderSyncChannel::DotGraphicsUpdate 
+        { 
+            index: 0, layer: 0.0, 
+            dots: SHAPE64.to_vec() 
         }
     );
     true
