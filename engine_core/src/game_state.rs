@@ -33,7 +33,7 @@ impl GameState{
     }
 
 
-    pub fn run(&mut self, module_id : ModuleId)
+    pub fn run(&mut self, module_id : ModuleId)->bool
     {
         match module_id
         {

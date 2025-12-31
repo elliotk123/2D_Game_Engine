@@ -17,18 +17,26 @@ impl Scheduler{
         }
     }
 
-    pub fn run(&self, game : &mut GameState){
+    pub fn run(&self, game : &mut GameState)->bool{
         for minor_cycle in self.schedule.iter()
         {
             let minor_cycle_start_time = Instant::now(); 
             for task in minor_cycle.iter()
             {
-                game.run(task.clone());
+                let task_start_time : Instant = Instant::now();
+                let result = game.run(task.clone());
+                if result == false {
+                    return false;
+                }
+                let task_duration = task_start_time.elapsed();
+                println!("Task {} us", task_duration.as_micros());
+
             }
             let minor_cycle_duration : Duration = minor_cycle_start_time.elapsed();
             if minor_cycle_duration > self.minor_cycle_dur
             {
-                println!("OVERFRAME!");
+                println!("OVERFRAME! {} us", minor_cycle_duration.as_micros());
+                return false;
             }
             else
             {
@@ -41,5 +49,6 @@ impl Scheduler{
                 }
             }
         }
+        return true;
     }
 }

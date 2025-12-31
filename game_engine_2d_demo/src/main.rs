@@ -18,8 +18,10 @@ fn main() {
 
     let mut game_state : GameState = GameState::new(minor_cycle as f32/1000000.0);
 
-    'running: loop {
-        scheduler.run(&mut game_state)
+    let mut run = true;
+
+    while run == true{
+        run = scheduler.run(&mut game_state);
     }
 
 }

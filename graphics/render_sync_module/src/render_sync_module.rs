@@ -28,7 +28,7 @@ impl RenderSyncModule{
 }
 
 impl EngineModule for RenderSyncModule {
-    fn run(&mut self, bus : &mut EngineBus) {
+    fn run(&mut self, bus : &mut EngineBus)->bool {
         //1. Drain LogicToRenderSync channel
         while let Ok(msg) = bus.logic_to_render_sync.rx.try_recv() {
             match msg {
@@ -107,5 +107,6 @@ impl EngineModule for RenderSyncModule {
                     colour_id: colour}).unwrap();
             }
         }
+        return true;
     }
 }

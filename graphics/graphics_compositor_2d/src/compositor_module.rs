@@ -76,7 +76,7 @@ impl CompositorModule{
 }
 
 impl EngineModule for CompositorModule{
-    fn run(&mut self, bus : &mut EngineBus)
+    fn run(&mut self, bus : &mut EngineBus)->bool
     {
         // First Drain all Queued RenderCommands
         while let Ok(cmd) = bus.render_sync_to_compositor.rx.try_recv()
@@ -124,6 +124,7 @@ impl EngineModule for CompositorModule{
 
         //Finally Publish Frame.
         bus.compositor_to_sysout.tx.send(CompositorToSysOutCommand::Frame(frame)).unwrap();
+        return true;
 
     }
 }

@@ -11,10 +11,10 @@ pub enum ModuleId{
 }
 
 pub trait EngineModule {
-    fn run(&mut self, bus : &mut EngineBus);
+    fn run(&mut self, bus : &mut EngineBus)->bool;
 }
 
 pub trait EngineIoModule{
-    fn write_output(&mut self, bus : &mut EngineBus);
-    fn read_input(&mut self, bus : &mut EngineBus);
+    fn write_output(&mut self, bus : &mut EngineBus)->bool;
+    fn read_input(&mut self, bus : &mut EngineBus)->bool;
 }

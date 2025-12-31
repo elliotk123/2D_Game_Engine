@@ -55,10 +55,14 @@ impl GameLogicModule{
 }
 
 impl EngineModule for GameLogicModule{
-    fn run(&mut self, bus : &mut EngineBus){
+    fn run(&mut self, bus : &mut EngineBus)->bool{
         // read input channels
         self.read_input_messages(bus);
-        process(self.inputs.clone(), &mut self.state_data, &mut self.outputs);
+        let result = process(self.inputs.clone(), &mut self.state_data, &mut self.outputs);
+        if result == false {
+            return false;
+        }
         self.write_output_messages(bus);
+        return true;
     }
 }

@@ -96,7 +96,7 @@ impl PhysicsModule
 
 impl EngineModule for PhysicsModule
 {
-    fn run(&mut self, bus : &mut EngineBus)
+    fn run(&mut self, bus : &mut EngineBus)->bool
     {
         self.handle_messages(bus);
 
@@ -104,5 +104,7 @@ impl EngineModule for PhysicsModule
         {
             entity.update(self.delta_t_s);
         }
+
+        return true;
     }
 }
