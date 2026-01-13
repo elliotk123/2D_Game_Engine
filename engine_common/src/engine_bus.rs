@@ -75,7 +75,7 @@ pub enum PhysicsToRenderSyncChannel{
 }
 
 pub enum CompositorToSysOutCommand{
-    Frame(PixelBuffer)
+    Frame(Vec<u8>)
 }
 
 pub enum RenderCommand{
@@ -94,6 +94,10 @@ pub enum SysInToGameLogicChannel{
     TouchEvents
 }
 
+pub enum SysInToCompositorChannel{
+    BufferRecycle(Vec<u8>)
+}
+
 pub struct Channel<T>{ 
     pub rx : Receiver<T>,
     pub tx : Sender<T>
@@ -105,7 +109,8 @@ pub struct EngineBus{
     pub physics_to_render_sync : Channel<PhysicsToRenderSyncChannel>,
     pub render_sync_to_compositor : Channel<RenderCommand>,
     pub compositor_to_sysout : Channel<CompositorToSysOutCommand>,
-    pub sysin_to_logic : Channel<SysInToGameLogicChannel>
+    pub sysin_to_logic : Channel<SysInToGameLogicChannel>,
+    pub sysin_to_compositor : Channel<SysInToCompositorChannel>
 }
 
 impl EngineBus{
@@ -118,6 +123,7 @@ impl EngineBus{
         let (renderer_to_compositor_tx, renderer_to_compositor_rx) = unbounded::<RenderCommand>();
         let (compositor_to_sysout_tx, compositor_to_sysout_rx) = unbounded::<CompositorToSysOutCommand>();
         let (sysin_to_logic_tx, sysin_to_logic_rx) = unbounded::<SysInToGameLogicChannel>();
+        let (sysin_to_compositor_tx, sysin_to_compositor_rx) = unbounded::<SysInToCompositorChannel>();
 
         EngineBus
         {
@@ -128,6 +134,7 @@ impl EngineBus{
             render_sync_to_compositor : Channel { tx:renderer_to_compositor_tx, rx:renderer_to_compositor_rx },
             compositor_to_sysout      : Channel { tx:compositor_to_sysout_tx,   rx:compositor_to_sysout_rx },
             sysin_to_logic            : Channel { tx:sysin_to_logic_tx,         rx:sysin_to_logic_rx },
+            sysin_to_compositor       : Channel { tx:sysin_to_compositor_tx,    rx:sysin_to_compositor_rx },
         }
     }
 }

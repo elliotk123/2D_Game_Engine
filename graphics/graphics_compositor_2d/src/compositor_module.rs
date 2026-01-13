@@ -1,18 +1,17 @@
 use inter_module_comms::pixel_buffer::PixelBuffer;
+use std::time::{Duration, Instant};
 use engine_common::
 {
-    engine_module::EngineModule,
     engine_bus::
     {
-        EngineBus,
-        CompositorToSysOutCommand,
-        RenderCommand
-    },
+        CompositorToSysOutCommand, EngineBus, RenderCommand, SysInToCompositorChannel
+    }, engine_module::EngineModule
 };
 
 pub struct CompositorModule{
     id : u64,
     frame_buffer : PixelBuffer,
+    clear_buffer : PixelBuffer,
     palette : Vec<[u8;4]>
 }
 
@@ -25,7 +24,13 @@ impl CompositorModule{
         CompositorModule
         {
             id : 0,
-            frame_buffer: PixelBuffer::new(width, height,CLEAR_COLOUR),
+            frame_buffer: PixelBuffer
+            {
+                pixel_data : Vec::new(),
+                width,
+                height
+            },
+            clear_buffer : PixelBuffer::new(width, height, CLEAR_COLOUR),
             palette : vec! [
                 [  0,   0,   0, 255],
                 [255, 255, 255, 255], //  1 white
@@ -78,7 +83,20 @@ impl CompositorModule{
 impl EngineModule for CompositorModule{
     fn run(&mut self, bus : &mut EngineBus)->bool
     {
-        // First Drain all Queued RenderCommands
+        let compositor_start : Instant = Instant::now();
+        let mut message_num = 0;
+        // Get the buffer from the system input
+        while let Ok(msg) = bus.sysin_to_compositor.rx.try_recv()
+        {
+            match msg {
+                SysInToCompositorChannel::BufferRecycle(buffer)=> 
+                {
+                    self.frame_buffer.pixel_data = buffer;
+                    self.frame_buffer.pixel_data.copy_from_slice(&self.clear_buffer.pixel_data);
+                }
+            }
+        }
+        // Then Drain all Queued RenderCommands
         while let Ok(cmd) = bus.render_sync_to_compositor.rx.try_recv()
         {
             match cmd {
@@ -110,7 +128,9 @@ impl EngineModule for CompositorModule{
                     //insert pixel into frame buffer
                     let idx = (y * width + x) * BPP;
                     self.frame_buffer.pixel_data[idx..idx+BPP].copy_from_slice(&self.palette[colour_idx]);
-
+                    let duration = compositor_start.elapsed();
+                    message_num = message_num + 1;
+                    println!("Message {} finished at {} us", message_num, duration.as_micros());
                 }
             }
         }
@@ -118,12 +138,17 @@ impl EngineModule for CompositorModule{
         //Extract necessary data before mutably borrowing reference.
         let width  = self.frame_buffer.width as usize;
         let height = self.frame_buffer.height as usize;
-
+        // println!("{} us", compositor_start.elapsed().as_micros());
         //Next Hand off completed Frame Data.
-        let frame = std::mem::replace(&mut self.frame_buffer, PixelBuffer::new(width,height,CLEAR_COLOUR),);
+        // println!("{} us", compositor_start.elapsed().as_micros());
+        // let frame = std::mem::replace(&mut self.frame_buffer, clear_buffer);
+        let frame_pixel_data = std::mem::take(&mut self.frame_buffer.pixel_data);
 
+        // println!("{} us", compositor_start.elapsed().as_micros());
         //Finally Publish Frame.
-        bus.compositor_to_sysout.tx.send(CompositorToSysOutCommand::Frame(frame)).unwrap();
+        bus.compositor_to_sysout.tx.send(CompositorToSysOutCommand::Frame(frame_pixel_data)).unwrap();
+
+        // println!("{} us", compositor_start.elapsed().as_micros());
         return true;
 
     }
