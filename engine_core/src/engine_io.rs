@@ -4,9 +4,9 @@ use engine_common::engine_bus::{
 };
 use engine_common::engine_module::EngineIoModule;
 
-const WIDTH : usize = 1200;
-const HEIGHT : usize = 400;
-const FULLSCREEN : bool = true;
+const WIDTH : usize = 1000;
+const HEIGHT : usize = 500;
+// const FULLSCREEN : bool = true;
 
 pub struct EngineIO {
     system_interface : SystemInterface,
@@ -41,10 +41,10 @@ impl EngineIoModule for EngineIO{
             SysInToGameLogicChannel::KeyboardEvents{
                 events : self.system_interface.keyboard_interface.poll_events()
             }
-        );
+        ).unwrap();
         bus.sysin_to_compositor.tx.send(
             SysInToCompositorChannel::BufferRecycle(std::mem::take(&mut self.pixel_buffer))
-        );
+        ).unwrap();
         return true;
     }
 }

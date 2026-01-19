@@ -21,7 +21,7 @@ pub struct RenderSyncModule {
 impl RenderSyncModule{
     pub fn new()->Self {
         Self {
-            camera: Camera {x:0.0,y:0.0},
+            camera: Camera::new(),
             entities: HashMap::new(),
         }
     }
@@ -97,8 +97,10 @@ impl EngineModule for RenderSyncModule {
                 let camera_y = world_y - self.camera.y;
 
                 // Camera space -> screen
-                let screen_x = camera_x as i32;
-                let screen_y = camera_y as i32;
+                let screen_x = (camera_x*self.camera.ppm)as i32;
+                let screen_y = (camera_y*self.camera.ppm) as i32;
+
+               // println!("Screen [X : {}, Y : {}]", screen_x, screen_y);
 
                 bus.render_sync_to_compositor.tx.send(
                 RenderCommand::Pixel {

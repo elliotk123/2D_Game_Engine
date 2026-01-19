@@ -23,18 +23,18 @@ impl Scheduler{
             let minor_cycle_start_time = Instant::now(); 
             for task in minor_cycle.iter()
             {
-                let task_start_time : Instant = Instant::now();
+                // let task_start_time : Instant = Instant::now();
                 let result = game.run(task.clone());
                 if result == false {
                     return false;
                 }
-                let task_duration = task_start_time.elapsed();
+                // let task_duration = task_start_time.elapsed();
                 // println!("Task {} us", task_duration.as_micros());
 
             }
-            println!("\n");
+            // println!("\n");
             let minor_cycle_duration : Duration = minor_cycle_start_time.elapsed();
-            println!("Total process time {} ms", minor_cycle_duration.as_millis());
+            // println!("Total process time {} ms", minor_cycle_duration.as_millis());
             if minor_cycle_duration > self.minor_cycle_dur
             {
                 println!("OVERFRAME! {} us", minor_cycle_duration.as_micros());

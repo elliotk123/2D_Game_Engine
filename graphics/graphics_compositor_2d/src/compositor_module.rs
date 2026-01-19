@@ -1,5 +1,8 @@
 use inter_module_comms::pixel_buffer::PixelBuffer;
-use std::time::{Duration, Instant};
+use std::time::{
+    //Duration, 
+    Instant
+};
 use engine_common::
 {
     engine_bus::
@@ -9,7 +12,6 @@ use engine_common::
 };
 
 pub struct CompositorModule{
-    id : u64,
     frame_buffer : PixelBuffer,
     clear_buffer : PixelBuffer,
     palette : Vec<[u8;4]>
@@ -23,7 +25,6 @@ impl CompositorModule{
     {
         CompositorModule
         {
-            id : 0,
             frame_buffer: PixelBuffer
             {
                 pixel_data : Vec::new(),
@@ -102,8 +103,10 @@ impl EngineModule for CompositorModule{
             match cmd {
                 RenderCommand::Pixel {x,y,colour_id}=> 
                 {
+                    println!("X {}, Y {}, colour {}", x, y, colour_id);
                     //exclude off screen pixels
                     if x< 0 || y < 0{
+                        println!("Offscreen, less than 0,0");
                         continue;
                     }
 
@@ -113,31 +116,32 @@ impl EngineModule for CompositorModule{
 
                     let width = self.frame_buffer.width as usize;
                     let height = self.frame_buffer.height as usize;
-                    
+
                     //exclude off screen pixels
                     if x >= width || y >= height{
+                        println!("Offscreen, bounds are 0,0 .. {},{}",width,height);
                         continue;
                     }
                     
                     //look up colour in palette and exclude if colour does not exist
                     let colour_idx = colour_id as usize;
-                    if colour_idx < self.palette.len() {
+                    if colour_idx >= self.palette.len() {
+                        println!("Colour out of bounds {}  {}",colour_idx, self.palette.len());
                         continue;
                     }
 
                     //insert pixel into frame buffer
                     let idx = (y * width + x) * BPP;
                     self.frame_buffer.pixel_data[idx..idx+BPP].copy_from_slice(&self.palette[colour_idx]);
-                    let duration = compositor_start.elapsed();
+                    // let duration = compositor_start.elapsed();
                     message_num = message_num + 1;
-                    println!("Message {} finished at {} us", message_num, duration.as_micros());
+                    println!("Update pixel buffer {}, {}, {}, {}", self.frame_buffer.pixel_data[idx], self.frame_buffer.pixel_data[idx+1], self.frame_buffer.pixel_data[idx+2], self.frame_buffer.pixel_data[idx+3], );
+                    // println!("Message {} finished at {} us", message_num, duration.as_micros());
                 }
             }
         }
 
         //Extract necessary data before mutably borrowing reference.
-        let width  = self.frame_buffer.width as usize;
-        let height = self.frame_buffer.height as usize;
         // println!("{} us", compositor_start.elapsed().as_micros());
         //Next Hand off completed Frame Data.
         // println!("{} us", compositor_start.elapsed().as_micros());

@@ -1,5 +1,5 @@
 use engine_common::{
-    engine_bus::{EngineBus, PhysicsToLogicChannel, SysInToGameLogicChannel},
+    engine_bus::{EngineBus, SysInToGameLogicChannel},
     engine_module::EngineModule
 };
 
@@ -24,14 +24,17 @@ impl GameLogicModule{
 
     fn read_input_messages(&mut self, bus :  &mut EngineBus)
     {
-        for msg in bus.sysin_to_logic.rx.try_iter(){
+        // remove state inputs from previous frame
+        self.inputs.physics_events.clear();
+        while let Ok(msg) = bus.sysin_to_logic.rx.try_recv(){
             match msg{
                 SysInToGameLogicChannel::KeyboardEvents 
                 { 
                     events 
                 }=>
                 {
-                    self.inputs.keyboard_events = events
+                    self.inputs.keyboard_events = events;
+                    //println!("KEYBOARD EVENTS");
                 }
                 _ =>
                 {
@@ -39,18 +42,21 @@ impl GameLogicModule{
                 }
             }
         }
-        for msg in bus.physics_to_logic.rx.try_iter(){
+        while let Ok(msg) = bus.physics_to_logic.rx.try_recv(){
             self.inputs.physics_events.push(msg);
         }     
     }
 
-    fn write_output_messages(&self, bus: &mut EngineBus){
+    fn write_output_messages(&mut self, bus: &mut EngineBus){
         for msg in self.outputs.physics_commands.iter(){
-            bus.logic_to_physics.tx.send(msg.clone());
+            bus.logic_to_physics.tx.send(msg.clone()).unwrap();
         }
         for msg in self.outputs.render_sync_commands.iter(){
-            bus.logic_to_render_sync.tx.send(msg.clone());
+            bus.logic_to_render_sync.tx.send(msg.clone()).unwrap();
         }
+        // Clear the internal buffers
+        self.outputs.physics_commands.clear();
+        self.outputs.render_sync_commands.clear();
     }
 }
 
@@ -58,7 +64,7 @@ impl EngineModule for GameLogicModule{
     fn run(&mut self, bus : &mut EngineBus)->bool{
         // read input channels
         self.read_input_messages(bus);
-        let result = process(self.inputs.clone(), &mut self.state_data, &mut self.outputs);
+        let result = process(&self.inputs, &mut self.state_data, &mut self.outputs);
         if result == false {
             return false;
         }

@@ -1,5 +1,4 @@
 use crossbeam::channel::{Sender, Receiver, unbounded};
-use inter_module_comms::pixel_buffer::PixelBuffer;
 use system_interface::common::keyboard_interface::{MyKeyboardEvent};
 
 #[derive(Debug, Clone)]

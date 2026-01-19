@@ -25,7 +25,7 @@ impl GameState{
         GameState { 
             engine_bus    : EngineBus::new(),
             physics_2d    : PhysicsModule::new(delta_t_s), 
-            compositor_2d : CompositorModule::new(1200,400),
+            compositor_2d : CompositorModule::new(1000,500),
             render_sync   : RenderSyncModule::new(),
             engine_io     : EngineIO::new(),
             game_logic    : GameLogicModule::new()
