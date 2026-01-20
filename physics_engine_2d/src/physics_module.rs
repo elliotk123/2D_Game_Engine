@@ -1,12 +1,13 @@
 use super::entity::Entity;
 use super::particle::Particle;
 use super::shape::Shape;
-use super::vector2::Vector2;
+use engine_math::vector2::Vector2;
 
 use engine_common::{
     engine_bus::{
         EngineBus, 
-        LogicToPhysicsChannel
+        LogicToPhysicsChannel,
+        PhysicsToRenderSyncChannel
     },
     engine_module::EngineModule
 };
@@ -29,7 +30,7 @@ impl PhysicsModule
     }
 
     fn handle_messages(&mut self, bus :  &mut EngineBus){
-        for msg in bus.logic_to_physics.rx.try_iter(){
+        while let Ok(msg) = bus.logic_to_physics.rx.try_recv(){
             match msg{
                 LogicToPhysicsChannel::AddEntity{
                     mass,
@@ -78,6 +79,12 @@ impl PhysicsModule
                         }
                     );
                 },
+                LogicToPhysicsChannel::ApplyCenterlineForce { 
+                    index, force 
+                } => {
+                    self.entities[index].apply_centerline_force(force);
+                    // println!("APPLY CENTERLINE FORCE {} {}", index, force);
+                }
                 LogicToPhysicsChannel::ApplyTorque { 
                     index, 
                     torque 
@@ -91,7 +98,7 @@ impl PhysicsModule
 
 impl EngineModule for PhysicsModule
 {
-    fn run(&mut self, bus : &mut EngineBus)
+    fn run(&mut self, bus : &mut EngineBus)->bool
     {
         self.handle_messages(bus);
 
@@ -99,5 +106,21 @@ impl EngineModule for PhysicsModule
         {
             entity.update(self.delta_t_s);
         }
+
+        let i = 0;
+
+        for entity in self.entities.iter_mut()
+        {
+            bus.physics_to_render_sync.tx.send(PhysicsToRenderSyncChannel::Position{
+                index : i,
+                x : entity.particle.position.x as f64,
+                y : entity.particle.position.y as f64,
+            }).unwrap();
+            bus.physics_to_render_sync.tx.send(PhysicsToRenderSyncChannel::Orientation {
+                index : i,
+                orientation : entity.particle.orientation as f64,
+            }).unwrap();
+        }
+        return true;
     }
 }

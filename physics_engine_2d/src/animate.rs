@@ -1,5 +1,5 @@
 use super::entity::Entity;
-use super::vector2::Vector2;
+use engine_math::vector2::Vector2;
 use inter_module_comms::pixel_buffer::PixelBuffer;
 
 
@@ -30,13 +30,13 @@ pub fn animate(
                 buffer.set_pixel(
                     particle_vec.x.round() as usize, 
                     particle_vec.y.round() as usize, 
-                    &[255,0,0,255]
+                    [255_u8,0_u8,0_u8,255_u8]
                 );
             }else{
                 buffer.set_pixel(
                     iso_vec.x.round() as usize, 
                     iso_vec.y.round() as usize, 
-                    &[255,0,0,255]
+                    [255_u8,0_u8,0_u8,255_u8]
                 );
             }
         

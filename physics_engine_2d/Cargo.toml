@@ -15,3 +15,4 @@ vulkanalia = { version = "=0.25.0", features = ["libloading", "provisional", "wi
 winit = "0.29"
 inter_module_comms = {path = "../inter_module_comms"}
 engine_common = {path = "../engine_common"}
+engine_math = {path = "../engine_math"}

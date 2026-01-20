@@ -1,6 +1,7 @@
 use crossbeam::channel::{Sender, Receiver, unbounded};
 use system_interface::common::keyboard_interface::{MyKeyboardEvent};
 
+#[derive(Debug, Clone)]
 pub enum LogicToPhysicsChannel{
     AddEntity{
         mass : f32,
@@ -21,13 +22,18 @@ pub enum LogicToPhysicsChannel{
         forcex : f32,
         forcey : f32
     },
+    ApplyCenterlineForce{
+        index : usize,
+        force : f32
+    },
     ApplyTorque{
         index : usize,
         torque : f32
     }
 }
 
-pub enum LogicToCompositorChannel{
+#[derive(Debug, Clone)]
+pub enum LogicToRenderSyncChannel{
     BackgroundTexture,
     Camera{
         posx : f64,
@@ -35,9 +41,15 @@ pub enum LogicToCompositorChannel{
     },
     DotGraphicsUpdate{
         index : usize,
-        dots : Vec<f64>
+        layer : f64,
+        dots  : Vec<f64>
+    },
+    ChangeEntityColour{
+        index: usize,
+        colour_id: u16
     }
 }
+#[derive(Debug, Clone)]
 pub enum PhysicsToLogicChannel{
     Collision{
         index_a : usize,
@@ -49,7 +61,7 @@ pub enum PhysicsToLogicChannel{
     }
 }
 
-pub enum PhysicsToCompositorChannel{
+pub enum PhysicsToRenderSyncChannel{
     Position{
         index : usize,
         x : f64,
@@ -61,10 +73,16 @@ pub enum PhysicsToCompositorChannel{
     }
 }
 
-pub enum CompositorToSysOutChannel{
-    PixelBuffer{
-        data : Vec<u8>,
-    }
+pub enum CompositorToSysOutCommand{
+    Frame(Vec<u8>)
+}
+
+pub enum RenderCommand{
+    Pixel {
+        x: i32,
+        y: i32,
+        colour_id: u16,
+    },
 }
 
 pub enum SysInToGameLogicChannel{
@@ -75,35 +93,47 @@ pub enum SysInToGameLogicChannel{
     TouchEvents
 }
 
+pub enum SysInToCompositorChannel{
+    BufferRecycle(Vec<u8>)
+}
+
 pub struct Channel<T>{ 
     pub rx : Receiver<T>,
     pub tx : Sender<T>
 }
 pub struct EngineBus{
     pub logic_to_physics : Channel<LogicToPhysicsChannel>,
-    pub logic_to_compositor : Channel<LogicToCompositorChannel>,
+    pub logic_to_render_sync : Channel<LogicToRenderSyncChannel>,
     pub physics_to_logic : Channel<PhysicsToLogicChannel>,
-    pub physics_to_compositor : Channel<PhysicsToCompositorChannel>,
-    pub compositor_to_sysout : Channel<CompositorToSysOutChannel>,
-    pub sysin_to_logic : Channel<SysInToGameLogicChannel>
+    pub physics_to_render_sync : Channel<PhysicsToRenderSyncChannel>,
+    pub render_sync_to_compositor : Channel<RenderCommand>,
+    pub compositor_to_sysout : Channel<CompositorToSysOutCommand>,
+    pub sysin_to_logic : Channel<SysInToGameLogicChannel>,
+    pub sysin_to_compositor : Channel<SysInToCompositorChannel>
 }
 
 impl EngineBus{
-    pub fn new() -> Self
+    pub fn new() -> EngineBus
     {
-        let (lp_tx, lp_rx) = unbounded::<LogicToPhysicsChannel>();
-        let (lc_tx, lc_rx) = unbounded::<LogicToCompositorChannel>();
-        let (pl_tx, pl_rx) = unbounded::<PhysicsToLogicChannel>();
-        let (pc_tx, pc_rx) = unbounded::<PhysicsToCompositorChannel>();
-        let (cs_tx, cs_rx) = unbounded::<CompositorToSysOutChannel>();
-        let (sl_tx, sl_rx) = unbounded::<SysInToGameLogicChannel>();
-        EngineBus {
-            logic_to_physics: Channel { tx: lp_tx, rx: lp_rx },
-            logic_to_compositor: Channel { tx: lc_tx, rx: lc_rx },
-            physics_to_logic: Channel { tx: pl_tx, rx: pl_rx },
-            physics_to_compositor: Channel { tx: pc_tx, rx: pc_rx },
-            compositor_to_sysout: Channel { tx: cs_tx, rx: cs_rx },
-            sysin_to_logic: Channel { tx: sl_tx, rx: sl_rx },
+        let (logic_to_physics_tx, logic_to_physics_rx) = unbounded::<LogicToPhysicsChannel>();
+        let (logic_to_renderer_tx, logic_to_renderer_rx) = unbounded::<LogicToRenderSyncChannel>();
+        let (physics_to_logic_tx, physics_to_logic_rx) = unbounded::<PhysicsToLogicChannel>();
+        let (physics_to_renderer_tx, physics_to_renderer_rx) = unbounded::<PhysicsToRenderSyncChannel>();
+        let (renderer_to_compositor_tx, renderer_to_compositor_rx) = unbounded::<RenderCommand>();
+        let (compositor_to_sysout_tx, compositor_to_sysout_rx) = unbounded::<CompositorToSysOutCommand>();
+        let (sysin_to_logic_tx, sysin_to_logic_rx) = unbounded::<SysInToGameLogicChannel>();
+        let (sysin_to_compositor_tx, sysin_to_compositor_rx) = unbounded::<SysInToCompositorChannel>();
+
+        EngineBus
+        {
+            logic_to_physics          : Channel { tx:logic_to_physics_tx,       rx:logic_to_physics_rx },
+            logic_to_render_sync      : Channel { tx:logic_to_renderer_tx,      rx:logic_to_renderer_rx },
+            physics_to_logic          : Channel { tx:physics_to_logic_tx,       rx:physics_to_logic_rx },
+            physics_to_render_sync    : Channel { tx:physics_to_renderer_tx,    rx:physics_to_renderer_rx },
+            render_sync_to_compositor : Channel { tx:renderer_to_compositor_tx, rx:renderer_to_compositor_rx },
+            compositor_to_sysout      : Channel { tx:compositor_to_sysout_tx,   rx:compositor_to_sysout_rx },
+            sysin_to_logic            : Channel { tx:sysin_to_logic_tx,         rx:sysin_to_logic_rx },
+            sysin_to_compositor       : Channel { tx:sysin_to_compositor_tx,    rx:sysin_to_compositor_rx },
         }
     }
 }

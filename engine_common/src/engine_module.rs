@@ -6,14 +6,15 @@ pub enum ModuleId{
     COMP2D = 2,
     SYSIN  = 3,
     SYSOUT = 4,
-    LOGIC = 5
+    LOGIC  = 5,
+    RENDER = 6,
 }
 
 pub trait EngineModule {
-    fn run(&mut self, bus : &mut EngineBus);
+    fn run(&mut self, bus : &mut EngineBus)->bool;
 }
 
 pub trait EngineIoModule{
-    fn write_output(&mut self, bus : &mut EngineBus);
-    fn read_input(&mut self, bus : &mut EngineBus);
+    fn write_output(&mut self, bus : &mut EngineBus)->bool;
+    fn read_input(&mut self, bus : &mut EngineBus)->bool;
 }

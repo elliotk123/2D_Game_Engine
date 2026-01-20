@@ -1,4 +1,4 @@
-use crate::vector2::Vector2;
+use engine_math::vector2::Vector2;
 use crate::particle::{Particle};
 use crate::shape::{Shape};
 

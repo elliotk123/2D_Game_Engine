@@ -6,7 +6,8 @@ edition = "2021"
 [dependencies]
 crossbeam = "0.8"
 physics_engine_2d = {path = "../physics_engine_2d"}
-graphics_compositor_2d = {path = "../graphics_compositor_2d"}
+graphics_compositor_2d = {path = "../graphics/graphics_compositor_2d"}
+render_sync = {path = "../graphics/render_sync_module"}
 system_interface = {path = "../system_interface"}
 game_logic = {path = "../game_logic"}
 engine_common = {path = "../engine_common"}
