@@ -4,20 +4,20 @@ use engine_common::{
 };
 
 use super::game_logic_io::{GameLogicInputs, GameLogicOutputs};
-use super::game_logic_conf::{GameLogicState, process};
+use super::game_conf::GameConf;
 
-#[derive(Debug, Clone)]
-pub struct GameLogicModule{
-    inputs :GameLogicInputs,
-    state_data : GameLogicState,
+#[derive(Clone)]
+pub struct GameLogicModule<T : GameConf>{
+    inputs : GameLogicInputs,
+    game_conf : T,
     outputs : GameLogicOutputs
 }
 
-impl GameLogicModule{
-    pub fn new() -> GameLogicModule{
+impl<T : GameConf> GameLogicModule<T>{
+    pub fn new() -> GameLogicModule<T>{
         GameLogicModule{
             inputs : GameLogicInputs::new(),
-            state_data : GameLogicState::new(),
+            game_conf : T::new(),
             outputs : GameLogicOutputs::new()
         }
     }
@@ -60,11 +60,11 @@ impl GameLogicModule{
     }
 }
 
-impl EngineModule for GameLogicModule{
+impl<T : GameConf> EngineModule for GameLogicModule<T>{
     fn run(&mut self, bus : &mut EngineBus)->bool{
         // read input channels
         self.read_input_messages(bus);
-        let result = process(&self.inputs, &mut self.state_data, &mut self.outputs);
+        let result = self.game_conf.process(&self.inputs, &mut self.outputs);
         if result == false {
             return false;
         }

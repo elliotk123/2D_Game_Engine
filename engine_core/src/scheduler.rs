@@ -1,6 +1,7 @@
 use std::time::{Duration, Instant};
 
 use engine_common::engine_module::ModuleId;
+use game_logic::game_conf::GameConf;
 use super::game_state::GameState;
 
 pub struct Scheduler {
@@ -10,14 +11,14 @@ pub struct Scheduler {
 }
 
 impl Scheduler{
-    pub fn new(minor_cycle_us: u64, schedule : Vec<Vec<ModuleId>>) -> Scheduler{
+    pub fn new(minor_cycle_dur: Duration, schedule : Vec<Vec<ModuleId>>) -> Scheduler{
         Scheduler{
-            minor_cycle_dur : Duration::from_micros(minor_cycle_us),
+            minor_cycle_dur,
             schedule : schedule.clone()
         }
     }
 
-    pub fn run(&self, game : &mut GameState)->bool{
+    pub fn run<T : GameConf>(&self, game : &mut GameState<T>)->bool{
         for minor_cycle in self.schedule.iter()
         {
             let minor_cycle_start_time = Instant::now(); 

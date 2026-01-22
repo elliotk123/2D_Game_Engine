@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use super::entity::Entity;
 use super::particle::Particle;
 use super::shape::Shape;
@@ -19,12 +21,12 @@ pub struct PhysicsModule {
 
 impl PhysicsModule
 {
-    pub fn new(delta_t : f32, )->PhysicsModule
+    pub fn new(delta_t : Duration, )->PhysicsModule
     {
         PhysicsModule
         {
             entities : Vec::new(),
-            delta_t_s : delta_t
+            delta_t_s : delta_t.as_secs_f32()
         }
 
     }

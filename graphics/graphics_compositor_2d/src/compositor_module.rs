@@ -1,8 +1,8 @@
 use inter_module_comms::pixel_buffer::PixelBuffer;
-use std::time::{
-    //Duration, 
-    Instant
-};
+// use std::time::{
+//     //Duration, 
+//     Instant
+// };
 use engine_common::
 {
     engine_bus::
@@ -84,7 +84,7 @@ impl CompositorModule{
 impl EngineModule for CompositorModule{
     fn run(&mut self, bus : &mut EngineBus)->bool
     {
-        let compositor_start : Instant = Instant::now();
+        // let compositor_start : Instant = Instant::now();
         let mut message_num = 0;
         // Get the buffer from the system input
         while let Ok(msg) = bus.sysin_to_compositor.rx.try_recv()
