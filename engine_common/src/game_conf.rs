@@ -1,4 +1,4 @@
-use engine_common::engine_bus::{LogicToPhysicsChannel, LogicToRenderSyncChannel, PhysicsToLogicChannel};
+use super::engine_bus::{LogicToPhysicsChannel, LogicToRenderSyncChannel, PhysicsToLogicChannel};
 use system_interface::common::keyboard_interface::{MyKeyboardEvent};
 
 #[derive(Debug, Clone)]
@@ -34,3 +34,9 @@ impl GameLogicOutputs
         }
     }
 }
+
+pub trait GameConf{
+    fn new() -> Self;
+    fn process(&mut self, input: &GameLogicInputs, output : &mut GameLogicOutputs) -> bool;
+}
+

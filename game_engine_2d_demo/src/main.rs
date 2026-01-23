@@ -3,11 +3,8 @@ use std::time::Duration;
 use engine_core::run;
 use engine_common::{
     engine_module::ModuleId,
-    engine_bus::{LogicToPhysicsChannel, LogicToRenderSyncChannel}
-};
-use game_logic::{
-    game_logic_io::{GameLogicInputs, GameLogicOutputs},
-    game_conf::GameConf
+    engine_bus::{LogicToPhysicsChannel, LogicToRenderSyncChannel},
+    game_conf::{GameLogicInputs, GameLogicOutputs,GameConf}
 };
 use system_interface::common::keyboard_interface::{MyKeyboardEvent, MyKey};
 

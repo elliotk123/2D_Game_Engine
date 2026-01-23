@@ -1,7 +1,9 @@
 use std::time::Duration;
 
-use engine_common::engine_module::ModuleId;
-use game_logic::game_conf::GameConf;
+use engine_common::{
+    engine_module::ModuleId,
+    game_conf::GameConf
+};
 
 use crate::{game_state::GameState, scheduler::Scheduler};
 

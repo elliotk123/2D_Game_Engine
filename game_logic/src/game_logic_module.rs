@@ -1,10 +1,8 @@
 use engine_common::{
     engine_bus::{EngineBus, SysInToGameLogicChannel},
-    engine_module::EngineModule
+    engine_module::EngineModule,
+    game_conf::{GameConf, GameLogicInputs, GameLogicOutputs}
 };
-
-use super::game_logic_io::{GameLogicInputs, GameLogicOutputs};
-use super::game_conf::GameConf;
 
 #[derive(Clone)]
 pub struct GameLogicModule<T : GameConf>{

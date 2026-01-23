@@ -2,9 +2,10 @@ use std::time::Duration;
 
 use engine_common::{
     engine_module::{ModuleId, EngineModule, EngineIoModule},
-    engine_bus::{EngineBus}
+    engine_bus::EngineBus,
+    game_conf::GameConf
 };
-use game_logic::{game_conf::GameConf, game_logic_module::GameLogicModule};
+use game_logic::game_logic_module::GameLogicModule;
 use physics_engine_2d::physics_module::PhysicsModule;
 use graphics_compositor_2d::compositor_module::CompositorModule;
 use render_sync::render_sync_module::RenderSyncModule;
