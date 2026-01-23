@@ -1,7 +1,7 @@
 use crate::common;
 
 use sdl3::video::{Window, WindowContext};
-use sdl3::pixels::{PixelFormatEnum, PixelFormat};
+use sdl3::pixels::PixelFormat;
 use sdl3::render::{Texture, TextureCreator, WindowCanvas};
 
 use super::sdl3_types::SdlStateShared;
@@ -49,9 +49,7 @@ impl GraphicsBackend for Sdl3GraphicsBackend
 
         let mut texture: Texture<'_> = texture_creator
             .create_texture_streaming(
-                unsafe{
-                    PixelFormat::from_ll(PixelFormatEnum::ARGB8888.to_ll())
-                },
+                PixelFormat::ARGB8888,
                 // Use a 32-bit format like ARGB8888 (4 bytes per pixel)
                 width, 
                 height
