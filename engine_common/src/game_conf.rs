@@ -1,3 +1,7 @@
+use std::time::Duration;
+
+use crate::engine_module::ModuleId;
+
 use super::engine_bus::{LogicToPhysicsChannel, LogicToRenderSyncChannel, PhysicsToLogicChannel};
 use system_interface::common::keyboard_interface::{MyKeyboardEvent};
 
@@ -38,5 +42,28 @@ impl GameLogicOutputs
 pub trait GameConf{
     fn new() -> Self;
     fn process(&mut self, input: &GameLogicInputs, output : &mut GameLogicOutputs) -> bool;
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct ScreenSettings{
+    pub full_screen : bool,
+    pub screen_width : usize,
+    pub screen_height : usize
+}
+
+pub struct EngineSettings{
+    pub schedule : Vec<Vec<ModuleId>>,
+    pub minor_cycle : Duration,
+    pub screen_settings : ScreenSettings
+}
+
+impl Clone for EngineSettings{
+    fn clone(&self)->EngineSettings{
+        EngineSettings{
+            schedule: self.schedule.clone(),
+            minor_cycle : self.minor_cycle,
+            screen_settings : self.screen_settings
+        }
+    }
 }
 

@@ -1,12 +1,13 @@
-use crate::common;
-
 use sdl3::video::{Window, WindowContext};
 use sdl3::pixels::PixelFormat;
 use sdl3::render::{Texture, TextureCreator, WindowCanvas};
 
 use super::sdl3_types::SdlStateShared;
 
-use common::graphical_interface::GraphicsBackend;
+use super::super::common::graphical_interface::{
+    GraphicsBackend,
+    WindowData
+};
 
 pub struct Sdl3GraphicsBackend
 {
@@ -27,7 +28,7 @@ impl Sdl3GraphicsBackend{
 
 impl GraphicsBackend for Sdl3GraphicsBackend
 {
-    fn create_window(&mut self, width : u32, height : u32, name : &str) -> usize{
+    fn create_window(&mut self, width : u32, height : u32, name : &str) -> WindowData{
         let shared: std::cell::RefMut<'_, super::sdl3_types::SdlState> = self.shared_sdl.borrow_mut();
         let window : Window = shared.video_subsystem.window(name, width, height)
             .position_centered()
@@ -36,7 +37,28 @@ impl GraphicsBackend for Sdl3GraphicsBackend
 
         self.canvases.push(window.into_canvas());
 
-        self.canvases.len() - 1
+        WindowData{
+            id : self.canvases.len() - 1,
+            height : 0,
+            width : 0
+        }
+    }
+
+    fn create_fullscreen_window(&mut self, name : &str) -> WindowData {
+        let shared: std::cell::RefMut<'_, super::sdl3_types::SdlState> = self.shared_sdl.borrow_mut();
+        let window : Window = shared.video_subsystem.window(name, 0, 0)
+            .fullscreen()
+            .position_centered()
+            .build()
+            .unwrap();
+        let (width, height) = window.size_in_pixels();
+        self.canvases.push(window.into_canvas());
+  
+        WindowData{
+            id : self.canvases.len() - 1,
+            height : height as usize,
+            width : width as usize
+        }     
     }
 
     fn render(&mut self, pixel_buffer: &Vec<u8>, window_id : usize)

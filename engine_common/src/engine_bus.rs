@@ -1,4 +1,5 @@
 use crossbeam::channel::{Sender, Receiver, unbounded};
+use inter_module_comms::pixel_buffer::PixelBuffer;
 use system_interface::common::keyboard_interface::{MyKeyboardEvent};
 
 #[derive(Debug, Clone)]
@@ -94,7 +95,11 @@ pub enum SysInToGameLogicChannel{
 }
 
 pub enum SysInToCompositorChannel{
-    BufferRecycle(Vec<u8>)
+    BufferRecycle{
+        data : Vec<u8>,
+        width : usize,
+        height : usize
+    }
 }
 
 pub struct Channel<T>{ 

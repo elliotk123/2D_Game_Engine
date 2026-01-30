@@ -14,24 +14,31 @@ use engine_common::
 pub struct CompositorModule{
     frame_buffer : PixelBuffer,
     clear_buffer : PixelBuffer,
-    palette : Vec<[u8;4]>
+    palette : Vec<[u8;4]>,
+    initialised : bool
 }
 
 pub const BPP : usize = 4;
 pub const CLEAR_COLOUR : [u8;4] = [0, 0, 0, 255];
 
 impl CompositorModule{
-    pub fn new(width: usize, height: usize) -> CompositorModule
+    pub fn new() -> CompositorModule
     {
         CompositorModule
         {
             frame_buffer: PixelBuffer
             {
                 pixel_data : Vec::new(),
-                width,
-                height
+                width : 0,
+                height : 0
             },
-            clear_buffer : PixelBuffer::new(width, height, CLEAR_COLOUR),
+            clear_buffer : PixelBuffer 
+            { 
+                pixel_data: Vec::new(), 
+                width : 0, 
+                height : 0 
+            },
+            // clear_buffer : PixelBuffer::new(width, height, CLEAR_COLOUR),
             palette : vec! [
                 [  0,   0,   0, 255],
                 [255, 255, 255, 255], //  1 white
@@ -76,7 +83,8 @@ impl CompositorModule{
                 [  0, 128, 128, 255], // 29 teal
                 [128, 128,   0, 255], // 30 olive
                 [245, 245, 220, 255], // 31 beige
-                ]     
+            ],
+            initialised : false
         }
     }
 }
@@ -90,9 +98,19 @@ impl EngineModule for CompositorModule{
         while let Ok(msg) = bus.sysin_to_compositor.rx.try_recv()
         {
             match msg {
-                SysInToCompositorChannel::BufferRecycle(buffer)=> 
+                SysInToCompositorChannel::BufferRecycle{
+                    data,
+                    width,
+                    height
+                }=> 
                 {
-                    self.frame_buffer.pixel_data = buffer;
+                    self.frame_buffer.pixel_data = data;
+                    self.frame_buffer.width = width;
+                    self.frame_buffer.height = height;
+                    if !self.initialised{
+                        self.clear_buffer = PixelBuffer::new(width, height, CLEAR_COLOUR);
+                        self.initialised = true;
+                    }
                     self.frame_buffer.pixel_data.copy_from_slice(&self.clear_buffer.pixel_data);
                 }
             }
