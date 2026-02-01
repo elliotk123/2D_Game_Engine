@@ -34,13 +34,13 @@ impl GraphicsBackend for Sdl3GraphicsBackend
             .position_centered()
             .build()
             .unwrap();
-
+        let (width, height) = window.size_in_pixels();
         self.canvases.push(window.into_canvas());
 
         WindowData{
             id : self.canvases.len() - 1,
-            height : 0,
-            width : 0
+            height : height as usize,
+            width : width as usize
         }
     }
 

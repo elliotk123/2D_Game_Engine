@@ -121,40 +121,41 @@ impl EngineModule for CompositorModule{
             match cmd {
                 RenderCommand::Pixel {x,y,colour_id}=> 
                 {
-                    println!("X {}, Y {}, colour {}", x, y, colour_id);
-                    //exclude off screen pixels
-                    if x< 0 || y < 0{
-                        println!("Offscreen, less than 0,0");
-                        continue;
+                    if self.initialised{
+                        //exclude off screen pixels
+                        if x< 0 || y < 0{
+                            // println!("Offscreen, less than 0,0");
+                            continue;
+                        }
+
+                        //normalise types
+                        let x = x as usize;
+                        let y = y as usize;
+
+                        let width = self.frame_buffer.width as usize;
+                        let height = self.frame_buffer.height as usize;
+
+                        //exclude off screen pixels
+                        if x >= width || y >= height{
+                            // println!("Offscreen, bounds are 0,0 .. {},{}",width,height);
+                            continue;
+                        }
+                        
+                        //look up colour in palette and exclude if colour does not exist
+                        let colour_idx = colour_id as usize;
+                        if colour_idx >= self.palette.len() {
+                            println!("Colour out of bounds {}  {}",colour_idx, self.palette.len());
+                            continue;
+                        }
+
+                        //insert pixel into frame buffer
+                        let idx = (y * width + x) * BPP;
+                        self.frame_buffer.pixel_data[idx..idx+BPP].copy_from_slice(&self.palette[colour_idx]);
+                        // let duration = compositor_start.elapsed();
+                        message_num = message_num + 1;
+                        // println!("Update pixel buffer {}, {}, {}, {}", self.frame_buffer.pixel_data[idx], self.frame_buffer.pixel_data[idx+1], self.frame_buffer.pixel_data[idx+2], self.frame_buffer.pixel_data[idx+3], );
+                        // println!("Message {} finished at {} us", message_num, duration.as_micros());
                     }
-
-                    //normalise types
-                    let x = x as usize;
-                    let y = y as usize;
-
-                    let width = self.frame_buffer.width as usize;
-                    let height = self.frame_buffer.height as usize;
-
-                    //exclude off screen pixels
-                    if x >= width || y >= height{
-                        println!("Offscreen, bounds are 0,0 .. {},{}",width,height);
-                        continue;
-                    }
-                    
-                    //look up colour in palette and exclude if colour does not exist
-                    let colour_idx = colour_id as usize;
-                    if colour_idx >= self.palette.len() {
-                        println!("Colour out of bounds {}  {}",colour_idx, self.palette.len());
-                        continue;
-                    }
-
-                    //insert pixel into frame buffer
-                    let idx = (y * width + x) * BPP;
-                    self.frame_buffer.pixel_data[idx..idx+BPP].copy_from_slice(&self.palette[colour_idx]);
-                    // let duration = compositor_start.elapsed();
-                    message_num = message_num + 1;
-                    println!("Update pixel buffer {}, {}, {}, {}", self.frame_buffer.pixel_data[idx], self.frame_buffer.pixel_data[idx+1], self.frame_buffer.pixel_data[idx+2], self.frame_buffer.pixel_data[idx+3], );
-                    // println!("Message {} finished at {} us", message_num, duration.as_micros());
                 }
             }
         }
