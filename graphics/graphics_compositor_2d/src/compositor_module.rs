@@ -14,24 +14,31 @@ use engine_common::
 pub struct CompositorModule{
     frame_buffer : PixelBuffer,
     clear_buffer : PixelBuffer,
-    palette : Vec<[u8;4]>
+    palette : Vec<[u8;4]>,
+    initialised : bool
 }
 
 pub const BPP : usize = 4;
 pub const CLEAR_COLOUR : [u8;4] = [0, 0, 0, 255];
 
 impl CompositorModule{
-    pub fn new(width: usize, height: usize) -> CompositorModule
+    pub fn new() -> CompositorModule
     {
         CompositorModule
         {
             frame_buffer: PixelBuffer
             {
                 pixel_data : Vec::new(),
-                width,
-                height
+                width : 0,
+                height : 0
             },
-            clear_buffer : PixelBuffer::new(width, height, CLEAR_COLOUR),
+            clear_buffer : PixelBuffer 
+            { 
+                pixel_data: Vec::new(), 
+                width : 0, 
+                height : 0 
+            },
+            // clear_buffer : PixelBuffer::new(width, height, CLEAR_COLOUR),
             palette : vec! [
                 [  0,   0,   0, 255],
                 [255, 255, 255, 255], //  1 white
@@ -76,7 +83,8 @@ impl CompositorModule{
                 [  0, 128, 128, 255], // 29 teal
                 [128, 128,   0, 255], // 30 olive
                 [245, 245, 220, 255], // 31 beige
-                ]     
+            ],
+            initialised : false
         }
     }
 }
@@ -90,9 +98,19 @@ impl EngineModule for CompositorModule{
         while let Ok(msg) = bus.sysin_to_compositor.rx.try_recv()
         {
             match msg {
-                SysInToCompositorChannel::BufferRecycle(buffer)=> 
+                SysInToCompositorChannel::BufferRecycle{
+                    data,
+                    width,
+                    height
+                }=> 
                 {
-                    self.frame_buffer.pixel_data = buffer;
+                    self.frame_buffer.pixel_data = data;
+                    self.frame_buffer.width = width;
+                    self.frame_buffer.height = height;
+                    if !self.initialised{
+                        self.clear_buffer = PixelBuffer::new(width, height, CLEAR_COLOUR);
+                        self.initialised = true;
+                    }
                     self.frame_buffer.pixel_data.copy_from_slice(&self.clear_buffer.pixel_data);
                 }
             }
@@ -103,40 +121,41 @@ impl EngineModule for CompositorModule{
             match cmd {
                 RenderCommand::Pixel {x,y,colour_id}=> 
                 {
-                    println!("X {}, Y {}, colour {}", x, y, colour_id);
-                    //exclude off screen pixels
-                    if x< 0 || y < 0{
-                        println!("Offscreen, less than 0,0");
-                        continue;
+                    if self.initialised{
+                        //exclude off screen pixels
+                        if x< 0 || y < 0{
+                            // println!("Offscreen, less than 0,0");
+                            continue;
+                        }
+
+                        //normalise types
+                        let x = x as usize;
+                        let y = y as usize;
+
+                        let width = self.frame_buffer.width as usize;
+                        let height = self.frame_buffer.height as usize;
+
+                        //exclude off screen pixels
+                        if x >= width || y >= height{
+                            // println!("Offscreen, bounds are 0,0 .. {},{}",width,height);
+                            continue;
+                        }
+                        
+                        //look up colour in palette and exclude if colour does not exist
+                        let colour_idx = colour_id as usize;
+                        if colour_idx >= self.palette.len() {
+                            println!("Colour out of bounds {}  {}",colour_idx, self.palette.len());
+                            continue;
+                        }
+
+                        //insert pixel into frame buffer
+                        let idx = (y * width + x) * BPP;
+                        self.frame_buffer.pixel_data[idx..idx+BPP].copy_from_slice(&self.palette[colour_idx]);
+                        // let duration = compositor_start.elapsed();
+                        message_num = message_num + 1;
+                        // println!("Update pixel buffer {}, {}, {}, {}", self.frame_buffer.pixel_data[idx], self.frame_buffer.pixel_data[idx+1], self.frame_buffer.pixel_data[idx+2], self.frame_buffer.pixel_data[idx+3], );
+                        // println!("Message {} finished at {} us", message_num, duration.as_micros());
                     }
-
-                    //normalise types
-                    let x = x as usize;
-                    let y = y as usize;
-
-                    let width = self.frame_buffer.width as usize;
-                    let height = self.frame_buffer.height as usize;
-
-                    //exclude off screen pixels
-                    if x >= width || y >= height{
-                        println!("Offscreen, bounds are 0,0 .. {},{}",width,height);
-                        continue;
-                    }
-                    
-                    //look up colour in palette and exclude if colour does not exist
-                    let colour_idx = colour_id as usize;
-                    if colour_idx >= self.palette.len() {
-                        println!("Colour out of bounds {}  {}",colour_idx, self.palette.len());
-                        continue;
-                    }
-
-                    //insert pixel into frame buffer
-                    let idx = (y * width + x) * BPP;
-                    self.frame_buffer.pixel_data[idx..idx+BPP].copy_from_slice(&self.palette[colour_idx]);
-                    // let duration = compositor_start.elapsed();
-                    message_num = message_num + 1;
-                    println!("Update pixel buffer {}, {}, {}, {}", self.frame_buffer.pixel_data[idx], self.frame_buffer.pixel_data[idx+1], self.frame_buffer.pixel_data[idx+2], self.frame_buffer.pixel_data[idx+3], );
-                    // println!("Message {} finished at {} us", message_num, duration.as_micros());
                 }
             }
         }

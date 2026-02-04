@@ -1,9 +1,7 @@
 use std::time::Duration;
 
 use engine_common::{
-    engine_module::{ModuleId, EngineModule, EngineIoModule},
-    engine_bus::EngineBus,
-    game_conf::GameConf
+    engine_bus::EngineBus, engine_module::{EngineIoModule, EngineModule, ModuleId}, game_conf::{EngineSettings, GameConf}
 };
 use game_logic::game_logic_module::GameLogicModule;
 use physics_engine_2d::physics_module::PhysicsModule;
@@ -23,14 +21,14 @@ pub struct GameState<T : GameConf> {
 }
 
 impl<T : GameConf> GameState<T>{
-    pub fn new(delta_t : Duration) -> GameState<T>
+    pub fn new(settings : EngineSettings) -> GameState<T>
     {
         GameState { 
             engine_bus    : EngineBus::new(),
-            physics_2d    : PhysicsModule::new(delta_t), 
-            compositor_2d : CompositorModule::new(1000,500),
+            physics_2d    : PhysicsModule::new(settings.minor_cycle), 
+            compositor_2d : CompositorModule::new(),
             render_sync   : RenderSyncModule::new(),
-            engine_io     : EngineIO::new(),
+            engine_io     : EngineIO::new(settings.screen_settings),
             game_logic    : GameLogicModule::new()
         }
     }

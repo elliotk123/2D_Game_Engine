@@ -1,21 +1,20 @@
-use std::time::Duration;
+
 
 use engine_common::{
-    engine_module::ModuleId,
-    game_conf::GameConf
+    game_conf::{EngineSettings, GameConf}
 };
 
 use crate::{game_state::GameState, scheduler::Scheduler};
 
-pub fn run<T : GameConf>(schedule : Vec<Vec<ModuleId>>, minor_cycle : Duration)
+pub fn run<T : GameConf>(settings : EngineSettings)
 {
-    let scheduler = Scheduler::new(minor_cycle, schedule);
+    let scheduler = Scheduler::new(settings.schedule.clone());
 
-    let mut game_state : GameState<T> = GameState::new(minor_cycle);
+    let mut game_state : GameState<T> = GameState::new(settings.clone());
 
     let mut run = true;
 
     while run == true{
-        run = scheduler.run(&mut game_state);
+        run = scheduler.run(&mut game_state, settings.minor_cycle);
     }
 }

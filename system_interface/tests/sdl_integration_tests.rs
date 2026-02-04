@@ -1,5 +1,8 @@
 use system_interface::init_system_interface;
-use system_interface::common::keyboard_interface::{MyKey, MyKeyboardEvent};
+use system_interface::common::{
+    keyboard_interface::{MyKey, MyKeyboardEvent},
+    graphical_interface::WindowData
+};
 
 fn set_argb_pixel(
     buffer: &mut Vec<u8>, 
@@ -34,7 +37,7 @@ fn create_window_test(){
     let pixel_buffer: &mut Vec<u8> = &mut vec![125; BUFFER_SIZE as usize];
 
     let mut interface: system_interface::SystemInterface = init_system_interface();
-    let window_id: usize = interface.graphical_interface.create_window(WINDOW_WIDTH, WINDOW_HEIGHT, "Test", 0);
+    let window_info: WindowData = interface.graphical_interface.create_window(WINDOW_WIDTH, WINDOW_HEIGHT, "Test", 0);
     let mut counter = 0;
     'running: loop {
         // 1. You MUST poll events here!
@@ -47,7 +50,7 @@ fn create_window_test(){
             }
         }
         set_argb_pixel(pixel_buffer, counter % WINDOW_WIDTH as usize, counter / WINDOW_WIDTH as usize, WINDOW_WIDTH as usize, OPAQUE_RED);
-        interface.graphical_interface.render_to_window(pixel_buffer, window_id, 0);
+        interface.graphical_interface.render_to_window(pixel_buffer, window_info.id, 0);
         // ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 60));
         counter += 1;
     }

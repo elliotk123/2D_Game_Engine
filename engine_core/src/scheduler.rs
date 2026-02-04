@@ -7,20 +7,18 @@ use engine_common::{
 use super::game_state::GameState;
 
 pub struct Scheduler {
-    minor_cycle_dur : Duration, // The minor cycle of the scheduler
     schedule : Vec<Vec<ModuleId>>
 
 }
 
 impl Scheduler{
-    pub fn new(minor_cycle_dur: Duration, schedule : Vec<Vec<ModuleId>>) -> Scheduler{
+    pub fn new(schedule : Vec<Vec<ModuleId>>) -> Scheduler{
         Scheduler{
-            minor_cycle_dur,
             schedule : schedule.clone()
         }
     }
 
-    pub fn run<T : GameConf>(&self, game : &mut GameState<T>)->bool{
+    pub fn run<T : GameConf>(&self, game : &mut GameState<T>, minor_cycle_dur: Duration)->bool{
         for minor_cycle in self.schedule.iter()
         {
             let minor_cycle_start_time = Instant::now(); 
@@ -38,7 +36,7 @@ impl Scheduler{
             // println!("\n");
             let minor_cycle_duration : Duration = minor_cycle_start_time.elapsed();
             // println!("Total process time {} ms", minor_cycle_duration.as_millis());
-            if minor_cycle_duration > self.minor_cycle_dur
+            if minor_cycle_duration > minor_cycle_dur
             {
                 println!("OVERFRAME! {} us", minor_cycle_duration.as_micros());
                 // return false;
@@ -47,7 +45,7 @@ impl Scheduler{
             {
                 loop
                 {
-                    if minor_cycle_start_time.elapsed() > self.minor_cycle_dur
+                    if minor_cycle_start_time.elapsed() > minor_cycle_dur
                     {
                         break;
                     };
