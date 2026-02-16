@@ -4,8 +4,8 @@ use engine_math::vector2::Vector2;
 pub struct Particle
 {
     pub position     : Vector2,
-    linear_velocity  : Vector2,
-    angular_velocity : f32,
+    pub linear_velocity  : Vector2,
+    pub angular_velocity : f32,
     pub orientation  : f32
     
 }

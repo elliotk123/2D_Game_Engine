@@ -1,5 +1,7 @@
 use std::time::Duration;
 
+use crate::entity_group::EntityGroup;
+
 use super::entity::Entity;
 use super::particle::Particle;
 use super::shape::Shape;
@@ -15,7 +17,7 @@ use engine_common::{
 };
 
 pub struct PhysicsModule {
-    entities : Vec<Entity>,
+    entity_groups : Vec<EntityGroup>,
     delta_t_s : f32,
 }
 
@@ -25,7 +27,7 @@ impl PhysicsModule
     {
         PhysicsModule
         {
-            entities : Vec::new(),
+            entity_groups : Vec::new(),
             delta_t_s : delta_t.as_secs_f32()
         }
 
@@ -34,7 +36,13 @@ impl PhysicsModule
     fn handle_messages(&mut self, bus :  &mut EngineBus){
         while let Ok(msg) = bus.logic_to_physics.rx.try_recv(){
             match msg{
+                LogicToPhysicsChannel::AddEntityGroup {
+                     num_entities_pow_2 
+                }=>{
+                    self.entity_groups.push(EntityGroup::new(num_entities_pow_2));
+                }
                 LogicToPhysicsChannel::AddEntity{
+                    group_index,
                     mass,
                     moi,
                     posx,
@@ -45,7 +53,7 @@ impl PhysicsModule
                     angvel,
                     shape
                 } => {
-                    self.entities.push(Entity::new(
+                    self.entity_groups[group_index].add_entity(Entity::new(
                         Particle::new(
                             Vector2 { x: posx, y: posy },
                             Vector2 { x: velx, y: vely },
@@ -67,31 +75,45 @@ impl PhysicsModule
                     ));
                 },
                 LogicToPhysicsChannel::RemoveEntity{
+                    group_index,
                     index
                 } => {
-                    self.entities.remove(index);
+                    self.entity_groups[group_index].delete_entity(index);
                 },
                 LogicToPhysicsChannel::ApplyForce { 
-                    index, forcex, forcey 
+                    group_index,
+                    index,
+                    forcex,
+                    forcey
                 } => {
-                    self.entities[index].apply_force(
+                    self.entity_groups[group_index].apply_force(
                         Vector2 {
                              x: forcex, 
                              y: forcey 
-                        }
+                        },
+                        index
                     );
                 },
                 LogicToPhysicsChannel::ApplyCenterlineForce { 
-                    index, force 
+                    group_index,
+                    index,
+                    force 
                 } => {
-                    self.entities[index].apply_centerline_force(force);
+                    self.entity_groups[group_index].apply_centerline_force(force, index);
                     // println!("APPLY CENTERLINE FORCE {} {}", index, force);
-                }
+                },
                 LogicToPhysicsChannel::ApplyTorque { 
+                    group_index,
                     index, 
                     torque 
                 } => {
-                    self.entities[index].apply_torque(torque);
+                    self.entity_groups[group_index].apply_torque(torque, index);
+                },
+                LogicToPhysicsChannel::ApplyField {
+                    group_index,
+                    field
+                }=> {
+                    self.entity_groups[group_index].apply_field(field);
                 }
             }
         }
@@ -104,24 +126,26 @@ impl EngineModule for PhysicsModule
     {
         self.handle_messages(bus);
 
-        for entity in self.entities.iter_mut()
+        for entity_group in self.entity_groups.iter_mut()
         {
-            entity.update(self.delta_t_s);
+            entity_group.update(self.delta_t_s);
         }
 
         let i = 0;
 
-        for entity in self.entities.iter_mut()
+        for entity_group in self.entity_groups.iter_mut()
         {
-            bus.physics_to_render_sync.tx.send(PhysicsToRenderSyncChannel::Position{
-                index : i,
-                x : entity.particle.position.x as f64,
-                y : entity.particle.position.y as f64,
-            }).unwrap();
-            bus.physics_to_render_sync.tx.send(PhysicsToRenderSyncChannel::Orientation {
-                index : i,
-                orientation : entity.particle.orientation as f64,
-            }).unwrap();
+            for particle in entity_group.particles.into_iter(){
+                bus.physics_to_render_sync.tx.send(PhysicsToRenderSyncChannel::Position{
+                    index : i,
+                    x : *(particle.x) as f64,
+                    y : *(particle.y) as f64,
+                }).unwrap();
+                bus.physics_to_render_sync.tx.send(PhysicsToRenderSyncChannel::Orientation {
+                    index : i,
+                    orientation : *(particle.orientation) as f64,
+                }).unwrap();
+            }
         }
         return true;
     }

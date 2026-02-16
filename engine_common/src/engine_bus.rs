@@ -1,9 +1,35 @@
 use crossbeam::channel::{Sender, Receiver, unbounded};
+use engine_math::vector2::Vector2;
 use system_interface::common::keyboard_interface::{MyKeyboardEvent};
 
 #[derive(Debug, Clone)]
+pub enum ForceField{
+    Constant{ // e.g. gravity on a 2D sidescroller
+        force : Vector2,
+        charge : Box<[f32]>        
+    },
+    InverseSquare{ // e.g. gravity in a space sim
+        source : usize,
+        constant : f32,
+        charge : Box<[f32]>
+    },
+    InverseSquareNBody{// e.g. N body gravity sim
+        constant : f32,
+        charge : Box<[f32]>
+    },
+    LJPotential{ // Leonard-Jones potential, used for simulating phases of matter
+        a : f32,
+        b : f32
+    }
+}
+
+#[derive(Debug, Clone)]
 pub enum LogicToPhysicsChannel{
+    AddEntityGroup{
+        num_entities_pow_2 : u32
+    },
     AddEntity{
+        group_index : usize,
         mass : f32,
         moi : f32,
         posx : f32,
@@ -15,20 +41,28 @@ pub enum LogicToPhysicsChannel{
         shape : Vec<f32>
     },
     RemoveEntity{
+        group_index : usize,
         index : usize
     },
     ApplyForce{
+        group_index : usize,
         index : usize,
         forcex : f32,
         forcey : f32
     },
     ApplyCenterlineForce{
+        group_index : usize,
         index : usize,
         force : f32
     },
     ApplyTorque{
+        group_index : usize,
         index : usize,
         torque : f32
+    },
+    ApplyField{
+        group_index : usize,
+        field : ForceField
     }
 }
 

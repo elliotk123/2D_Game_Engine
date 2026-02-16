@@ -7,8 +7,8 @@ pub struct Entity
 {
     pub particle       : Particle,
     pub shape          : Shape,
-    mass               : f32,
-    moment_of_inertia  : f32,
+    pub mass               : f32,
+    pub moment_of_inertia  : f32,
     force_accumulator  : Vec<Vector2>,
     torque_accumulator : Vec<f32>
 }
