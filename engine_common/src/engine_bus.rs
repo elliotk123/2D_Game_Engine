@@ -128,7 +128,11 @@ pub enum SysInToGameLogicChannel{
 }
 
 pub enum SysInToCompositorChannel{
-    BufferRecycle(Vec<u8>)
+    BufferRecycle{
+        data : Vec<u8>,
+        width : usize,
+        height : usize
+    }
 }
 
 pub struct Channel<T>{ 
