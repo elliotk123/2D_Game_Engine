@@ -131,7 +131,7 @@ impl EngineModule for PhysicsModule
             entity_group.update(self.delta_t_s);
         }
 
-        let i = 0;
+        let mut i = 0;
 
         for entity_group in self.entity_groups.iter_mut()
         {
@@ -145,6 +145,7 @@ impl EngineModule for PhysicsModule
                     index : i,
                     orientation : *(particle.orientation) as f64,
                 }).unwrap();
+                i+=1;
             }
         }
         return true;

@@ -12,6 +12,9 @@ pub fn calculate_inverse_square
     charge : f32,
     position : Vector2
 )->Vector2{
+    if charge == 0.0{
+        return Vector2{x:0.0,y:0.0};
+    }
     let disp = position - source_pos;
     let mag = disp.magnitude();
     disp.scale(constant*charge*mag.powi(-3))
