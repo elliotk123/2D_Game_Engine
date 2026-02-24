@@ -1,0 +1,4 @@
+[[asset_definitions.animations]]
+key = "slime_bounce"
+framerate = 8
+sprite_keys = ["slime_0", "slime_1", "slime_2"]

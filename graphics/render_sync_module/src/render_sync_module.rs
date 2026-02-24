@@ -43,9 +43,9 @@ impl EngineModule for RenderSyncModule {
                     entity.layer_height = layer;
                 }
 
-                LogicToRenderSyncChannel::ChangeEntityColour { index, colour_id} => {
+                LogicToRenderSyncChannel::ChangeEntitySprite { index, sprite_key} => {
                     let entity = self.entities.entry(index).or_insert_with(RenderEntity::default);
-                    entity.colour_id = colour_id;
+                    entity.sprite_key = sprite_key;
                 },
                 LogicToRenderSyncChannel::BackgroundTexture => todo!()
             }
@@ -72,41 +72,35 @@ impl EngineModule for RenderSyncModule {
             //d. Convert to screen coordinates
             //e. Emit RenderCommand(s)
         for entity in self.entities.values() {
-            if entity.dots.is_empty() {
+            if entity.sprite_key == "N_A" {
                 continue;
             }
             let angle = entity.orientation;
-            let cos_a = angle.cos();
-            let sin_a = angle.sin();
-            let colour = entity.colour_id;
+
             //THIS ALL NEEDS REFACTORING TO USE Vector2 STRUCT
-            for chunk in entity.dots.chunks_exact(2) {
-                let local_x = chunk[0];
-                let local_y = chunk[1];
-
-                // Rotate local point
-                let rotated_x = local_x * cos_a - local_y * sin_a;
-                let rotated_y = local_x * sin_a + local_y * cos_a;
-
-                // Rotated Local -> world
-                let world_x = entity.x + rotated_x;
-                let world_y = entity.y + rotated_y;
-
+            for entity in self.entities.values() {
+                // Skip entities that don't have a sprite set yet
+                if entity.sprite_key.is_empty() || entity.sprite_key == "N_A" {
+                    continue;
+                }            
                 // World -> camera space
-                let camera_x = world_x - self.camera.x;
-                let camera_y = world_y - self.camera.y;
+                let camera_x = entity.x - self.camera.x;
+                let camera_y = entity.y - self.camera.y;
 
                 // Camera space -> screen
-                let screen_x = (camera_x*self.camera.ppm)as i32;
-                let screen_y = (camera_y*self.camera.ppm) as i32;
+                let screen_x = (camera_x * self.camera.ppm) as i32;
+                let screen_y = (camera_y * self.camera.ppm) as i32;
 
-               // println!("Screen [X : {}, Y : {}]", screen_x, screen_y);
+                // Debug
+                // println!("RenderSync sprite '{}' at {},{}", entity.sprite_key, screen_x, screen_y);
 
-                bus.render_sync_to_compositor.tx.send(
-                RenderCommand::Pixel {
-                    x: screen_x,
-                    y: screen_y,
-                    colour_id: colour}).unwrap();
+                bus.render_sync_to_compositor.tx
+                    .send(RenderCommand::Sprite {
+                        x: screen_x,
+                        y: screen_y,
+                        sprite_key: entity.sprite_key.clone(),
+                    })
+                    .unwrap();
             }
         }
         return true;

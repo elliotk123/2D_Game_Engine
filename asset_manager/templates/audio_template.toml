@@ -1,0 +1,5 @@
+[[asset_definitions.audio]]
+key = "slime_squish"
+file_path = "assets/audio/slime_squish.wav"
+time_offset = 250
+duration = 400

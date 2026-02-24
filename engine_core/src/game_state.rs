@@ -20,18 +20,25 @@ pub struct GameState<T : GameConf> {
     engine_io     : EngineIO,
 }
 
-impl<T : GameConf> GameState<T>{
-    pub fn new(settings : EngineSettings) -> GameState<T>
-    {
-        GameState { 
-            engine_bus    : EngineBus::new(),
-            physics_2d    : PhysicsModule::new(settings.minor_cycle), 
-            compositor_2d : CompositorModule::new(),
-            render_sync   : RenderSyncModule::new(),
-            engine_io     : EngineIO::new(settings.screen_settings),
-            game_logic    : GameLogicModule::new()
+use asset_manager::{load_manifest_and_definitions, AssetManager};
+
+impl<T: GameConf> GameState<T> {
+    pub fn new(settings: EngineSettings) -> GameState<T> {
+        // Bootstrap: build asset manager
+    let defs = load_manifest_and_definitions(&settings.asset_manifest_path)
+        .expect("Failed to load asset manifest");
+    let assets = AssetManager::from_loaded_definitions(defs);
+
+        GameState {
+            engine_bus: EngineBus::new(),
+            physics_2d: PhysicsModule::new(settings.minor_cycle),
+            compositor_2d: CompositorModule::new(settings.screen_settings, assets), // see below
+            render_sync: RenderSyncModule::new(),
+            engine_io: EngineIO::new(settings.screen_settings),
+            game_logic: GameLogicModule::new(),
         }
     }
+
 
 
     pub fn run(&mut self, module_id : ModuleId)->bool

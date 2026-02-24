@@ -1,0 +1,5 @@
+[[asset_definitions.sprites]]
+key = "enemy_idle"
+file_path = "assets/sprites/enemy_idle.png"
+size = [24, 24]
+offset = [0, 0]

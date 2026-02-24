@@ -1,15 +1,16 @@
 use std::time::Duration;
 
-use crate::engine_module::ModuleId;
+use crate::{engine_bus::PhysicsEventToLogicChannel, engine_bus::PhysicsStateToLogicChannel, engine_module::ModuleId};
 
-use super::engine_bus::{LogicToPhysicsChannel, LogicToRenderSyncChannel, PhysicsToLogicChannel};
+use super::engine_bus::{LogicToPhysicsChannel, LogicToRenderSyncChannel};
 use system_interface::common::keyboard_interface::{MyKeyboardEvent};
 
 #[derive(Debug, Clone)]
 pub struct GameLogicInputs
 {
     pub keyboard_events : Vec<MyKeyboardEvent>,
-    pub physics_events : Vec<PhysicsToLogicChannel>,
+    pub physics_events  : Vec<PhysicsEventToLogicChannel>,
+    pub physics_states  : Vec<PhysicsStateToLogicChannel>,
 }
 
 impl GameLogicInputs
@@ -17,7 +18,8 @@ impl GameLogicInputs
     pub fn new() -> GameLogicInputs{
         GameLogicInputs{
             keyboard_events: Vec::new(),
-            physics_events : Vec::new()
+            physics_events : Vec::new(),
+            physics_states : Vec::new(),
         }
     }
 }
@@ -54,7 +56,8 @@ pub struct ScreenSettings{
 pub struct EngineSettings{
     pub schedule : Vec<Vec<ModuleId>>,
     pub minor_cycle : Duration,
-    pub screen_settings : ScreenSettings
+    pub screen_settings : ScreenSettings,
+    pub asset_manifest_path: String,
 }
 
 impl Clone for EngineSettings{
@@ -62,7 +65,8 @@ impl Clone for EngineSettings{
         EngineSettings{
             schedule: self.schedule.clone(),
             minor_cycle : self.minor_cycle,
-            screen_settings : self.screen_settings
+            screen_settings : self.screen_settings,
+            asset_manifest_path: self.asset_manifest_path.clone(),
         }
     }
 }

@@ -9,7 +9,9 @@ use engine_common::{
     engine_bus::{
         EngineBus, 
         LogicToPhysicsChannel,
-        PhysicsToRenderSyncChannel
+        PhysicsEventToLogicChannel,
+        PhysicsStateToLogicChannel,
+        PhysicsToRenderSyncChannel,
     },
     engine_module::EngineModule
 };
@@ -100,28 +102,39 @@ impl PhysicsModule
 
 impl EngineModule for PhysicsModule
 {
-    fn run(&mut self, bus : &mut EngineBus)->bool
-    {
+    fn run(&mut self, bus : &mut EngineBus)->bool{
         self.handle_messages(bus);
-
-        for entity in self.entities.iter_mut()
-        {
+        // 🔴 THIS WAS MISSING
+        for entity in self.entities.iter_mut() {
             entity.update(self.delta_t_s);
         }
 
-        let i = 0;
+        for (i, entity) in self.entities.iter().enumerate() {
+            // Existing: physics -> render_sync
+            bus.physics_to_render_sync.tx
+                .send(PhysicsToRenderSyncChannel::Position {
+                    index: i,
+                    x: entity.particle.position.x as f64,
+                    y: entity.particle.position.y as f64,
+                })
+                .unwrap();
 
-        for entity in self.entities.iter_mut()
-        {
-            bus.physics_to_render_sync.tx.send(PhysicsToRenderSyncChannel::Position{
-                index : i,
-                x : entity.particle.position.x as f64,
-                y : entity.particle.position.y as f64,
-            }).unwrap();
-            bus.physics_to_render_sync.tx.send(PhysicsToRenderSyncChannel::Orientation {
-                index : i,
-                orientation : entity.particle.orientation as f64,
-            }).unwrap();
+            bus.physics_to_render_sync.tx
+                .send(PhysicsToRenderSyncChannel::Orientation {
+                    index: i,
+                    orientation: entity.particle.orientation as f64,
+                })
+                .unwrap();
+
+            // NEW: physics state -> logic
+            bus.physics_state_to_logic.tx
+                .send(PhysicsStateToLogicChannel::EntityState {
+                    index: i,
+                    posx: entity.particle.position.x as f64,
+                    posy: entity.particle.position.y as f64,
+                    orientation: entity.particle.orientation as f64,
+                })
+                .unwrap();
         }
         return true;
     }

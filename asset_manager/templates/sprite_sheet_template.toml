@@ -1,0 +1,19 @@
+[[asset_definitions.spritesheets]]
+key = "effects_sheet"
+file_path = "assets/sheets/effects.png"
+quantity = 3
+
+  [[asset_definitions.spritesheets.sprites]]
+  key = "sparkle_0"
+  size = [16, 16]
+  offset = [0, 0]
+
+  [[asset_definitions.spritesheets.sprites]]
+  key = "sparkle_1"
+  size = [16, 16]
+  offset = [16, 0]
+
+  [[asset_definitions.spritesheets.sprites]]
+  key = "sparkle_2"
+  size = [16, 16]
+  offset = [32, 0]
