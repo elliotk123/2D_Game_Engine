@@ -88,8 +88,8 @@ impl EngineModule for RenderSyncModule {
                 
                 // Skip entities that don't have a sprite set yet
 
-                if entity.sprite_key.is_empty() || 
-                   entity.sprite_key == "N_A" {
+                if !entity.sprite_key.is_empty() &&
+                   entity.sprite_key != "N_A" {
                         continue;
                     }
 
@@ -113,6 +113,7 @@ impl EngineModule for RenderSyncModule {
                     .unwrap();
 
                 if  entity.dots.len() > 0 {
+                    println!("entity has {} dots",entity.dots.len());
                     for chunk in entity.dots.chunks_exact(2)
                     {
                         println!("Draw a pixel({},{})",chunk[0],chunk[1]);

@@ -157,10 +157,6 @@ impl EngineModule for CompositorModule{
                 }
             }
         }
-        // After clear_buffer copy, before publishing frame:
-        let w = self.frame_buffer.width as usize;
-        let idx = (10 * w + 10) * BPP;
-        self.frame_buffer.pixel_data[idx..idx+4].copy_from_slice(&[255, 0, 0, 255]); // bright red
 
         //Extract necessary data before mutably borrowing reference.
         // println!("{} us", compositor_start.elapsed().as_micros());
