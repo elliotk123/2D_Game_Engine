@@ -44,6 +44,7 @@ impl PhysicsModule
                      num_entities_pow_2 
                 }=>{
                     self.entity_groups.push(EntityGroup::new(num_entities_pow_2));
+                    self.force_fields.push(Vec::new());
                 }
                 LogicToPhysicsChannel::AddEntity{
                     group_index,
@@ -130,8 +131,12 @@ impl EngineModule for PhysicsModule
     fn run(&mut self, bus : &mut EngineBus)->bool{
         self.handle_messages(bus);
 
-        for entity_group in self.entity_groups.iter_mut()
+        for (entity_group, fields) in self.entity_groups.iter_mut().zip(&self.force_fields)
         {
+            for field in fields.iter(){
+                entity_group.apply_field(field);
+            }
+
             entity_group.update(self.delta_t_s);
         }
 
@@ -140,6 +145,7 @@ impl EngineModule for PhysicsModule
         for entity_group in self.entity_groups.iter_mut()
         {
             for particle in entity_group.particles.into_iter(){
+                println!("Physics is sending position to render Sync: ({},{})",particle.x,particle.y);
                 bus.physics_to_render_sync.tx.send(PhysicsToRenderSyncChannel::Position{
                     index : i,
                     x : *(particle.x),

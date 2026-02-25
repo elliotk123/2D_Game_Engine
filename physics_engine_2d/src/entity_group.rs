@@ -82,7 +82,7 @@ impl EntityGroup{
         }
     }
 
-    pub fn apply_field(&mut self, field : ForceField){
+    pub fn apply_field(&mut self, field : &ForceField){
         match field{
             ForceField::Constant 
             {
@@ -91,7 +91,7 @@ impl EntityGroup{
                 for((fx, fy),c) in 
                 self.force_x_accumulators.iter_mut()
                 .zip(&mut self.force_y_accumulators)
-                .zip(&charge)
+                .zip(charge)
                 .take(self.num_active_entities){
                     let calculated_force = calculate_constant_force(force, *c);
                     *fx += calculated_force.x;
@@ -106,8 +106,8 @@ impl EntityGroup{
             } => {
                 let source_position = Vector2
                 {
-                    x : self.particles.positions_x[source],
-                    y : self.particles.positions_y[source],
+                    x : self.particles.positions_x[*source],
+                    y : self.particles.positions_y[*source],
                 };
                 for(((p, fx),fy),c) in 
                 self.particles.into_iter()
@@ -117,10 +117,10 @@ impl EntityGroup{
                 .take(self.num_active_entities){
                     let force = calculate_inverse_square
                     (
-                        source_position,
-                        constant, 
-                        c, 
-                        Vector2{x: *p.x, y : *p.y} 
+                        &source_position,
+                        *constant, 
+                        *c, 
+                        &Vector2{x: *p.x, y : *p.y} 
                     );
                     *fx += force.x;
                     *fy += force.y;
@@ -146,10 +146,12 @@ impl EntityGroup{
 
         // update particles velocity and position with calculated acceleration
         self.particles.update(
+            0,
             delta_t,
              &self.force_x_accumulators[..n], 
              &self.force_y_accumulators[..n],
-             &self.torque_accumulators[..n]
+             &self.torque_accumulators[..n],
+             
         );
         // reset accumulated force values
         self.force_x_accumulators.fill(0.0);
