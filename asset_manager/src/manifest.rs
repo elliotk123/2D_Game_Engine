@@ -96,7 +96,7 @@ pub struct LoadedDefinitions {
 
 #[derive(Debug, Clone)]
 pub enum SpriteSource {
-    Standalone { file_path: PathBuf },
+    Standalone { file_path: PathBuf},
     Sheet { sheet_path: PathBuf, offset: [i32; 2], size: [i32; 2] },
 }
 
@@ -105,6 +105,8 @@ pub struct ResolvedSprite {
     pub key: String,
     pub source: PathBuf,
     pub sprite_source: SpriteSource,
+    pub offset : [i32; 2],
+    pub size : [i32; 2],
 }
 
 #[derive(Debug, Clone)]
@@ -236,6 +238,8 @@ fn resolve_and_validate(defs: AssetDefinitionsSourced, manifest_dir: PathBuf,) -
             sprite_source: SpriteSource::Standalone {
                 file_path: resolve_path(&manifest_dir, &fp),
             },
+            size: s.value.size,
+            offset:s.value.offset,
         });
     }
 
@@ -256,6 +260,8 @@ fn resolve_and_validate(defs: AssetDefinitionsSourced, manifest_dir: PathBuf,) -
                     offset: s.offset,
                     size: s.size,
                 },
+                size: s.size,
+                offset: s.offset,
             });
         }
     }

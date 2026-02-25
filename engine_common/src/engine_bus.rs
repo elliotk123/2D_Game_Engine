@@ -47,7 +47,11 @@ pub enum LogicToRenderSyncChannel{
     },
     ChangeEntitySprite{
         index: usize,
-        sprite_key: String
+        sprite_key: String,
+    },
+    ChangeEntityColor{
+        index:usize,
+        colour_id:u16,
     }
 }
 #[derive(Debug, Clone)]

@@ -9,11 +9,12 @@ pub struct SpriteAsset {
     pub width: u32,
     pub height: u32,
     pub rgba: Vec<u8>, // RGBA8888
+    pub offset: [i32; 2]
 }
 
 #[derive(Debug, Clone)]
 enum SpriteRef {
-    Standalone { path: PathBuf },
+    Standalone { path: PathBuf, offset: [i32; 2], size: [i32; 2]},
     SheetRegion { sheet_path: PathBuf, offset: [i32; 2], size: [i32; 2] },
 }
 
@@ -37,7 +38,7 @@ impl AssetManager {
         for s in defs.sprites {
             let key = s.key;
             let sref = match s.sprite_source {
-                SpriteSource::Standalone { file_path } => SpriteRef::Standalone { path: file_path },
+                SpriteSource::Standalone { file_path } => SpriteRef::Standalone { path: file_path, offset:s.offset, size: s.size},
                 SpriteSource::Sheet { sheet_path, offset, size } => {
                     SpriteRef::SheetRegion { sheet_path, offset, size }
                 }
@@ -64,14 +65,13 @@ impl AssetManager {
             })?;
 
             let sprite = match sref {
-                SpriteRef::Standalone { path } => load_sprite_rgba(&path)?,
+                SpriteRef::Standalone { path, offset, size } => load_sprite_rgba(&path,offset)?,
 
                 SpriteRef::SheetRegion { sheet_path, offset, size } => {
                     let sheet = self.load_sheet(&sheet_path)?;
                     extract_region_rgba(sheet, offset, size)?
                 }
             };
-
             self.loaded_sprites.insert(key.to_string(), sprite);
         }
 
@@ -87,7 +87,7 @@ impl AssetManager {
     }
 }
 
-fn load_sprite_rgba(path: &Path) -> AssetResult<SpriteAsset> {
+fn load_sprite_rgba(path: &Path, offset: [i32;2]) -> AssetResult<SpriteAsset> {
     let img = image::open(path).map_err(|e| AssetError::ImageDecode {
         path: path.to_path_buf(),
         source: e,
@@ -97,7 +97,7 @@ fn load_sprite_rgba(path: &Path) -> AssetResult<SpriteAsset> {
     let (width, height) = rgba_img.dimensions();
     let rgba = rgba_img.into_raw();
 
-    Ok(SpriteAsset { width, height, rgba })
+    Ok(SpriteAsset{ width, height, offset, rgba})
 }
 
 fn load_sheet_rgba(path: &Path) -> AssetResult<SheetAsset> {
@@ -156,9 +156,5 @@ fn extract_region_rgba(sheet: &SheetAsset, offset: [i32; 2], size: [i32; 2]) -> 
         out[dst_start..dst_end].copy_from_slice(&sheet.rgba[src_start..src_end]);
     }
 
-    Ok(SpriteAsset {
-        width: w_u,
-        height: h_u,
-        rgba: out,
-    })
+    Ok(SpriteAsset { width: w_u, height: h_u, rgba: out, offset })
 }
