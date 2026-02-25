@@ -1,35 +1,68 @@
 use crossbeam::channel::{Sender, Receiver, unbounded};
-use inter_module_comms::pixel_buffer::PixelBuffer;
+use engine_math::vector2::Vector2;
 use system_interface::common::keyboard_interface::{MyKeyboardEvent};
 
 #[derive(Debug, Clone)]
+pub enum ForceField{
+    Constant{ // e.g. gravity on a 2D sidescroller
+        force : Vector2,
+        charge : Box<[f64]>        
+    },
+    InverseSquare{ // e.g. gravity in a space sim
+        source : usize,
+        constant : f64,
+        charge : Box<[f64]>
+    },
+    InverseSquareNBody{// e.g. N body gravity sim
+        constant : f64,
+        charge : Box<[f64]>
+    },
+    LJPotential{ // Leonard-Jones potential, used for simulating phases of matter
+        a : f64,
+        b : f64
+    }
+}
+
+#[derive(Debug, Clone)]
 pub enum LogicToPhysicsChannel{
+    AddEntityGroup{
+        num_entities_pow_2 : u32
+    },
     AddEntity{
-        mass : f32,
-        moi : f32,
-        posx : f32,
-        posy : f32,
-        velx : f32,
-        vely : f32,
-        orien : f32,
-        angvel : f32,
-        shape : Vec<f32>
+        group_index : usize,
+        mass : f64,
+        moi : f64,
+        posx : f64,
+        posy : f64,
+        velx : f64,
+        vely : f64,
+        orien : f64,
+        angvel : f64,
+        shape : Vec<f64>
     },
     RemoveEntity{
+        group_index : usize,
         index : usize
     },
     ApplyForce{
+        group_index : usize,
         index : usize,
-        forcex : f32,
-        forcey : f32
+        forcex : f64,
+        forcey : f64
     },
     ApplyCenterlineForce{
+        group_index : usize,
         index : usize,
-        force : f32
+        force : f64
     },
     ApplyTorque{
+        group_index : usize,
         index : usize,
-        torque : f32
+        torque : f64
+    },
+    ApplyField{
+        group_index : usize,
+        field : ForceField
     }
 }
 

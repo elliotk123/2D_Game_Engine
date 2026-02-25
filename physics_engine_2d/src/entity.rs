@@ -7,14 +7,14 @@ pub struct Entity
 {
     pub particle       : Particle,
     pub shape          : Shape,
-    mass               : f32,
-    moment_of_inertia  : f32,
+    pub mass               : f64,
+    pub moment_of_inertia  : f64,
     force_accumulator  : Vec<Vector2>,
-    torque_accumulator : Vec<f32>
+    torque_accumulator : Vec<f64>
 }
 impl Entity
 {
-    pub fn new (particle: Particle, shape:Shape,mass:f32,moment_of_inertia : f32) -> Entity
+    pub fn new (particle: Particle, shape:Shape,mass:f64,moment_of_inertia : f64) -> Entity
     {
         Entity
         {
@@ -31,7 +31,7 @@ impl Entity
         self.force_accumulator.push(force);
     }
 
-    pub fn apply_centerline_force(&mut self, force: f32)
+    pub fn apply_centerline_force(&mut self, force: f64)
     {
         self.force_accumulator.push(
             Vector2 { x: (0.0), y: (force) }.rotate(self.particle.orientation)
@@ -39,12 +39,12 @@ impl Entity
     }
 
 
-    pub fn apply_torque( &mut self, torque: f32)
+    pub fn apply_torque( &mut self, torque: f64)
     {
         self.torque_accumulator.push(torque);
     }
 
-    pub fn update( &mut self, delta_t:f32)
+    pub fn update( &mut self, delta_t:f64)
     {
         let mut total_force = Vector2::new(0.0, 0.0);
         while self.force_accumulator.len() != 0

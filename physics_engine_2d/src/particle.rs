@@ -4,14 +4,14 @@ use engine_math::vector2::Vector2;
 pub struct Particle
 {
     pub position     : Vector2,
-    linear_velocity  : Vector2,
-    angular_velocity : f32,
-    pub orientation  : f32
+    pub linear_velocity  : Vector2,
+    pub angular_velocity : f64,
+    pub orientation  : f64
     
 }
 impl Particle
 {
-    pub fn new(pos : Vector2, lin_vel: Vector2, angular_vel : f32, angle : f32) -> Particle
+    pub fn new(pos : Vector2, lin_vel: Vector2, angular_vel : f64, angle : f64) -> Particle
     {
         Particle
         {
@@ -22,7 +22,7 @@ impl Particle
         }
     }
 
-    pub fn update(&mut self, delta_t : f32, lin_acc : Vector2, ang_acc : f32)
+    pub fn update(&mut self, delta_t : f64, lin_acc : Vector2, ang_acc : f64)
     {
         self.orientation += self.angular_velocity * delta_t + ang_acc * 0.5 * delta_t.powf(2.0);
         self.angular_velocity += ang_acc * delta_t;
