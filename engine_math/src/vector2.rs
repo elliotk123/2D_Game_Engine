@@ -8,12 +8,12 @@ use std::ops::SubAssign;
 #[derive(Debug, Copy, Clone)]
 pub struct Vector2
 {
-    pub x  : f32,
-    pub y  : f32
+    pub x  : f64,
+    pub y  : f64
 }
 impl Vector2
 {
-    pub fn new(x_val : f32, y_val : f32) -> Vector2
+    pub fn new(x_val : f64, y_val : f64) -> Vector2
     {
         Vector2
         {
@@ -21,11 +21,11 @@ impl Vector2
             y : y_val
         }
     }
-    pub fn magnitude(self) -> f32
+    pub fn magnitude(self) -> f64
     {
         return (self.x.powf(2.0) + self.y.powf(2.0)).sqrt();
     }
-    pub fn scale(self, value : f32) -> Vector2
+    pub fn scale(self, value : f64) -> Vector2
     {
         Vector2
         {
@@ -33,7 +33,7 @@ impl Vector2
             y : self.y * value
         }
     }
-    pub fn dot_product(self, rhs : Vector2) -> f32
+    pub fn dot_product(self, rhs : Vector2) -> f64
     {
         return (self.x * rhs.x) + (self.y * rhs.y);
     }
@@ -47,14 +47,14 @@ impl Vector2
     }
     pub fn normalise(self) -> Vector2
     {
-        let length : f32 = self.magnitude();
+        let length : f64 = self.magnitude();
         return  Vector2
                 {
                     x : self.x / length,
                     y : self.y / length
                 }
     }
-    pub fn rotate(self, theta: f32) -> Vector2
+    pub fn rotate(self, theta: f64) -> Vector2
     {
         Vector2
         {
@@ -119,10 +119,10 @@ impl Mul<Vector2> for Vector2
         }
     }
 }
-impl Mul<f32> for Vector2
+impl Mul<f64> for Vector2
 {
     type Output = Vector2;
-    fn mul(self,_rhs : f32) -> Vector2
+    fn mul(self,_rhs : f64) -> Vector2
     {
         Vector2{x: self.x,y: self.y}.scale(_rhs)
     }
@@ -132,7 +132,7 @@ impl Mul<i32> for Vector2
     type Output = Vector2;
     fn mul(self,_rhs : i32) -> Vector2
     {
-        Vector2{x: self.x,y: self.y}.scale(_rhs as f32)
+        Vector2{x: self.x,y: self.y}.scale(_rhs as f64)
     }
 }
 

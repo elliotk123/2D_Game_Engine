@@ -5,12 +5,12 @@ pub struct ParticleGroup
 {
     num_particles : usize,
     num_active_particles : usize,
-    pub positions_x : Box<[f32]>,
-    pub positions_y : Box<[f32]>,
-    velocities_x : Box<[f32]>,
-    velocities_y : Box<[f32]>,
-    pub orientations : Box<[f32]>,
-    angular_vels : Box<[f32]>
+    pub positions_x : Box<[f64]>,
+    pub positions_y : Box<[f64]>,
+    velocities_x : Box<[f64]>,
+    velocities_y : Box<[f64]>,
+    pub orientations : Box<[f64]>,
+    angular_vels : Box<[f64]>
 }
 
 impl ParticleGroup{
@@ -30,14 +30,15 @@ impl ParticleGroup{
 
     pub fn update(
         &mut self,
-        delta_t : f32, 
-        accel_x : &[f32], 
-        accel_y : &[f32], 
-        accel_ang : &[f32]
+        mode : u8,
+        delta_t : f64, 
+        accel_x : &[f64], 
+        accel_y : &[f64], 
+        accel_ang : &[f64]
     ){
-        update_dof(&mut self.positions_x,&mut self.velocities_x,&accel_x, delta_t);
-        update_dof(&mut self.positions_y,&mut self.velocities_y,&accel_y, delta_t);
-        update_dof(&mut self.orientations,&mut self.angular_vels,&accel_ang, delta_t);
+        update_dof(&mut self.positions_x,&mut self.velocities_x,&accel_x, delta_t, mode);
+        update_dof(&mut self.positions_y,&mut self.velocities_y,&accel_y, delta_t, mode);
+        update_dof(&mut self.orientations,&mut self.angular_vels,&accel_ang, delta_t, mode);
     }
 
     pub fn add_particle(&mut self, particle : Particle){
@@ -71,23 +72,38 @@ impl ParticleGroup{
     }
 }
 
-fn update_dof(p : &mut [f32], v : &mut [f32], a : &[f32], delta_t : f32)
+fn update_dof(p : &mut [f64], v : &mut [f64], a : &[f64], delta_t : f64, mode : u8)
 {
     for((pos, vel), acc) in 
         p.iter_mut().zip(v.iter_mut()).zip(a.iter())
     {
-        *pos += delta_t * (*vel + delta_t* *acc/2.0);
-        *vel += delta_t * *acc;
+        match mode{
+            0 => {
+                *vel += delta_t * *acc;
+                *pos += delta_t * (*vel + delta_t* *acc/2.0); 
+            },
+            1 => {
+                *pos += delta_t * (*vel + delta_t* *acc/2.0);
+            },
+            2 => {
+                *vel += delta_t * *acc;
+            },
+            _ => {
+                continue;
+            }
+        }
+   
+
     }
 }
 
 pub struct ParticleRef<'a> {
-    pub x: &'a f32,
-    pub y: &'a f32,
-    pub vx: &'a f32,
-    pub vy: &'a f32,
-    pub orientation: &'a f32,
-    pub ang_vel: &'a f32,
+    pub x: &'a f64,
+    pub y: &'a f64,
+    pub vx: &'a f64,
+    pub vy: &'a f64,
+    pub orientation: &'a f64,
+    pub ang_vel: &'a f64,
 }
 
 impl<'a> IntoIterator for &'a ParticleGroup {

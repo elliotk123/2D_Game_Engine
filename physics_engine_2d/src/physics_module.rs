@@ -9,16 +9,15 @@ use engine_math::vector2::Vector2;
 
 use engine_common::{
     engine_bus::{
-        EngineBus, 
-        LogicToPhysicsChannel,
-        PhysicsToRenderSyncChannel
+        EngineBus, ForceField, LogicToPhysicsChannel, PhysicsToRenderSyncChannel
     },
     engine_module::EngineModule
 };
 
 pub struct PhysicsModule {
     entity_groups : Vec<EntityGroup>,
-    delta_t_s : f32,
+    force_fields : Vec<Vec<ForceField>>,
+    delta_t_s : f64,
 }
 
 impl PhysicsModule
@@ -28,7 +27,7 @@ impl PhysicsModule
         PhysicsModule
         {
             entity_groups : Vec::new(),
-            delta_t_s : delta_t.as_secs_f32()
+            delta_t_s : delta_t.as_secs_f64()
         }
 
     }
@@ -113,7 +112,8 @@ impl PhysicsModule
                     group_index,
                     field
                 }=> {
-                    self.entity_groups[group_index].apply_field(field);
+                    // self.entity_groups[group_index].apply_field(field);
+                    self.force_fields[group_index].push(field);
                 }
             }
         }

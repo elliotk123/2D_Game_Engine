@@ -13,8 +13,8 @@ pub fn animate(
 )
 {
     let conversion = Vector2::new(
-        pix_x as f32/phys_x as f32,
-        pix_y as f32/phys_y as f32
+        pix_x as f64/phys_x as f64,
+        pix_y as f64/phys_y as f64
     );
 
     for e in entity_list.iter(){

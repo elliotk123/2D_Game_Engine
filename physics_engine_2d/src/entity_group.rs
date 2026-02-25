@@ -12,11 +12,11 @@ use crate::shape::Shape;
 pub struct EntityGroup {
     pub particles : ParticleGroup,
     shapes : Box<[Shape]>,
-    pub masses  : Box<[f32]>,
-    pub moments_of_intertia : Box<[f32]>,
-    force_x_accumulators : Box<[f32]>,
-    force_y_accumulators : Box<[f32]>,
-    torque_accumulators : Box<[f32]>,
+    pub masses  : Box<[f64]>,
+    pub moments_of_intertia : Box<[f64]>,
+    force_x_accumulators : Box<[f64]>,
+    force_y_accumulators : Box<[f64]>,
+    torque_accumulators : Box<[f64]>,
     num_entities : usize,
     pub num_active_entities : usize
 }
@@ -59,7 +59,7 @@ impl EntityGroup{
         }
     }
 
-    pub fn apply_centerline_force(&mut self, force:f32, entity_index : usize)
+    pub fn apply_centerline_force(&mut self, force:f64, entity_index : usize)
     {
         if entity_index >= self.num_active_entities{
             println!("Cannot apply centerline force to entity {}, enttiy not active", entity_index);
@@ -73,7 +73,7 @@ impl EntityGroup{
     }
 
 
-    pub fn apply_torque(&mut self, torque:f32, entity_index : usize)
+    pub fn apply_torque(&mut self, torque:f64, entity_index : usize)
     {
         if entity_index >= self.num_active_entities{
             println!("Cannot apply torque to entity {}, entity not active", entity_index);
@@ -131,7 +131,7 @@ impl EntityGroup{
         }
     }
 
-    pub fn update(&mut self, delta_t : f32){
+    pub fn update(&mut self, delta_t : f64){
         let n = self.num_active_entities;
         // iterate through forces and torques to calculate accelerations
         for((((fx,fy),m),t),i) in 
