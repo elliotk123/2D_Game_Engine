@@ -22,8 +22,11 @@ impl<T : GameConf> GameLogicModule<T>{
 
     fn read_input_messages(&mut self, bus :  &mut EngineBus)
     {
-        // remove state inputs from previous frame
+        // remove states and inputs from previous frame
         self.inputs.physics_events.clear();
+        self.inputs.physics_states.clear();
+
+        // scan for new messages
         while let Ok(msg) = bus.sysin_to_logic.rx.try_recv(){
             match msg{
                 SysInToGameLogicChannel::KeyboardEvents 
@@ -40,7 +43,10 @@ impl<T : GameConf> GameLogicModule<T>{
                 }
             }
         }
-        while let Ok(msg) = bus.physics_to_logic.rx.try_recv(){
+        while let Ok(msg) = bus.physics_state_to_logic.rx.try_recv() {
+            self.inputs.physics_states.push(msg);
+        }
+        while let Ok(msg) = bus.physics_event_to_logic.rx.try_recv(){
             self.inputs.physics_events.push(msg);
         }     
     }

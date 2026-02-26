@@ -4,6 +4,7 @@ pub struct RenderEntity {
     pub layer_height:f64,
     pub orientation: f64,
     pub dots: Vec<f64>, // local-space dots
+    pub sprite_key : String,
     pub colour_id : u16,
 }
 
@@ -24,6 +25,7 @@ impl Default for RenderEntity{
             layer_height:0.0,
             orientation:0.0,
             dots : Vec::<f64>::new(),
+            sprite_key: String::new(),
             colour_id : 0,
         }
     }

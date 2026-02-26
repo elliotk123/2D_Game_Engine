@@ -3,26 +3,40 @@ use inter_module_comms::pixel_buffer::PixelBuffer;
 //     //Duration, 
 //     Instant
 // };
+
+use asset_manager::AssetManager;
+
 use engine_common::
 {
     engine_bus::
     {
         CompositorToSysOutCommand, EngineBus, RenderCommand, SysInToCompositorChannel
-    }, engine_module::EngineModule
+    }, engine_module::EngineModule, game_conf::ScreenSettings
 };
 
 pub struct CompositorModule{
     frame_buffer : PixelBuffer,
     clear_buffer : PixelBuffer,
-    palette : Vec<[u8;4]>,
+    palette: [[u8; 4]; 8],   // debug only
+    assets: AssetManager,
     initialised : bool
 }
 
 pub const BPP : usize = 4;
 pub const CLEAR_COLOUR : [u8;4] = [0, 0, 0, 255];
+pub const DEBUG_PALETTE: [[u8; 4]; 8] = [
+    [255,   0,   0, 255], // 0: Red
+    [  0, 255,   0, 255], // 1: Green
+    [  0,   0, 255, 255], // 2: Blue
+    [255, 255,   0, 255], // 3: Yellow
+    [255,   0, 255, 255], // 4: Magenta
+    [  0, 255, 255, 255], // 5: Cyan
+    [255, 255, 255, 255], // 6: White
+    [  0,   0,   0, 255], // 7: Black
+];
 
 impl CompositorModule{
-    pub fn new() -> CompositorModule
+    pub fn new(_screen_settings: ScreenSettings, assets: AssetManager) -> CompositorModule
     {
         CompositorModule
         {
@@ -38,52 +52,8 @@ impl CompositorModule{
                 width : 0, 
                 height : 0 
             },
-            // clear_buffer : PixelBuffer::new(width, height, CLEAR_COLOUR),
-            palette : vec! [
-                [  0,   0,   0, 255],
-                [255, 255, 255, 255], //  1 white
-                [128, 128, 128, 255], //  2 grey
-                [192, 192, 192, 255], //  3 light grey
-
-                [255,   0,   0, 255], //  4 red
-                [200,   0,   0, 255], //  5 dark red
-                [255, 128, 128, 255], //  6 light red
-
-                [  0, 255,   0, 255], //  7 green
-                [  0, 180,   0, 255], //  8 dark green
-                [128, 255, 128, 255], //  9 light green
-
-                [  0,   0, 255, 255], // 10 blue
-                [  0,   0, 180, 255], // 11 dark blue
-                [128, 128, 255, 255], // 12 light blue
-
-                [255, 255,   0, 255], // 13 yellow
-                [200, 200,   0, 255], // 14 dark yellow
-
-                [255, 128,   0, 255], // 15 orange
-                [200, 100,   0, 255], // 16 dark orange
-
-                [128,   0, 255, 255], // 17 purple
-                [100,   0, 200, 255], // 18 dark purple
-
-                [255,   0, 255, 255], // 19 magenta
-                [200,   0, 200, 255], // 20 dark magenta
-
-                [  0, 255, 255, 255], // 21 cyan
-                [  0, 180, 180, 255], // 22 dark cyan
-
-                [150,  75,   0, 255], // 23 brown
-                [210, 180, 140, 255], // 24 tan
-
-                [255, 215,   0, 255], // 25 gold
-                [192, 192, 192, 255], // 26 silver
-
-                [255, 105, 180, 255], // 27 pink
-                [ 75,   0, 130, 255], // 28 indigo
-                [  0, 128, 128, 255], // 29 teal
-                [128, 128,   0, 255], // 30 olive
-                [245, 245, 220, 255], // 31 beige
-            ],
+            assets: assets,
+            palette: DEBUG_PALETTE,
             initialised : false
         }
     }
@@ -140,7 +110,7 @@ impl EngineModule for CompositorModule{
                             // println!("Offscreen, bounds are 0,0 .. {},{}",width,height);
                             continue;
                         }
-                        
+        
                         //look up colour in palette and exclude if colour does not exist
                         let colour_idx = colour_id as usize;
                         if colour_idx >= self.palette.len() {
@@ -157,8 +127,40 @@ impl EngineModule for CompositorModule{
                         // println!("Message {} finished at {} us", message_num, duration.as_micros());
                     }
                 }
+
+                RenderCommand::Sprite { x, y, sprite_key } =>
+                {
+                    println!("Compositor got Sprite '{}' at {},{}", sprite_key, x, y);
+                    if !self.initialised { continue; }
+
+                    let sprite = match self.assets.get_sprite(&sprite_key) {
+                        Ok(s) => s,
+                        Err(e) => {
+                            println!("Sprite load failed '{}': {:?}", sprite_key, e);
+                            continue;
+                        }
+                    };
+
+                    let dst_w = self.frame_buffer.width as usize;
+                    let dst_h = self.frame_buffer.height as usize;
+
+                    blit_rgba(
+                        &mut self.frame_buffer.pixel_data,
+                        dst_w,
+                        dst_h,
+                        x + sprite.offset[0],
+                        y + sprite.offset[1],
+                        sprite.width as usize,
+                        sprite.height as usize,
+                        &sprite.rgba,
+                    );
+                }
             }
         }
+        // After clear_buffer copy, before publishing frame:
+        let w = self.frame_buffer.width as usize;
+        let idx = (10 * w + 10) * BPP;
+        self.frame_buffer.pixel_data[idx..idx+4].copy_from_slice(&[255, 0, 0, 255]); // bright red
 
         //Extract necessary data before mutably borrowing reference.
         // println!("{} us", compositor_start.elapsed().as_micros());
@@ -177,3 +179,47 @@ impl EngineModule for CompositorModule{
     }
 }
 
+fn blit_rgba(
+    dst: &mut [u8],
+    dst_w: usize,
+    dst_h: usize,
+    x: i32,
+    y: i32,
+    src_w: usize,
+    src_h: usize,
+    src: &[u8],
+) {
+    let start_x = x.max(0) as usize;
+    let start_y = y.max(0) as usize;
+
+    let end_x = (x + src_w as i32).min(dst_w as i32).max(0) as usize;
+    let end_y = (y + src_h as i32).min(dst_h as i32).max(0) as usize;
+
+    if start_x >= end_x || start_y >= end_y {
+        return;
+    }
+
+    let dst_stride = dst_w * BPP;
+    let src_stride = src_w * BPP;
+
+    for dy in start_y..end_y {
+        let sy = (dy as i32 - y) as usize;
+
+        let dst_row = dy * dst_stride;
+        let src_row = sy * src_stride;
+
+        for dx in start_x..end_x {
+            let sx = (dx as i32 - x) as usize;
+
+            let dst_idx = dst_row + dx * BPP;
+            let src_idx = src_row + sx * BPP;
+
+            // alpha test (skip fully transparent)
+            if src[src_idx + 3] == 0 {
+                continue;
+            }
+
+            dst[dst_idx..dst_idx + BPP].copy_from_slice(&src[src_idx..src_idx + BPP]);
+        }
+    }
+}

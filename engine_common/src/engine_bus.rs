@@ -45,13 +45,17 @@ pub enum LogicToRenderSyncChannel{
         layer : f64,
         dots  : Vec<f64>
     },
-    ChangeEntityColour{
+    ChangeEntitySprite{
         index: usize,
-        colour_id: u16
+        sprite_key: String,
+    },
+    ChangeEntityColor{
+        index:usize,
+        colour_id:u16,
     }
 }
 #[derive(Debug, Clone)]
-pub enum PhysicsToLogicChannel{
+pub enum PhysicsEventToLogicChannel{
     Collision{
         index_a : usize,
         index_b : usize,
@@ -59,7 +63,17 @@ pub enum PhysicsToLogicChannel{
         pocy : f64,
         angle : f64,
         depth : f64
-    }
+    },
+}
+
+#[derive(Debug, Clone)]
+pub enum PhysicsStateToLogicChannel{
+    EntityState {
+        index: usize,
+        posx: f64,
+        posy: f64,
+        orientation: f64,
+    },
 }
 
 pub enum PhysicsToRenderSyncChannel{
@@ -83,6 +97,11 @@ pub enum RenderCommand{
         x: i32,
         y: i32,
         colour_id: u16,
+    },
+    Sprite { 
+        x: i32, 
+        y: i32, 
+        sprite_key: String 
     },
 }
 
@@ -109,7 +128,8 @@ pub struct Channel<T>{
 pub struct EngineBus{
     pub logic_to_physics : Channel<LogicToPhysicsChannel>,
     pub logic_to_render_sync : Channel<LogicToRenderSyncChannel>,
-    pub physics_to_logic : Channel<PhysicsToLogicChannel>,
+    pub physics_event_to_logic : Channel<PhysicsEventToLogicChannel>,
+    pub physics_state_to_logic : Channel<PhysicsStateToLogicChannel>,
     pub physics_to_render_sync : Channel<PhysicsToRenderSyncChannel>,
     pub render_sync_to_compositor : Channel<RenderCommand>,
     pub compositor_to_sysout : Channel<CompositorToSysOutCommand>,
@@ -122,7 +142,8 @@ impl EngineBus{
     {
         let (logic_to_physics_tx, logic_to_physics_rx) = unbounded::<LogicToPhysicsChannel>();
         let (logic_to_renderer_tx, logic_to_renderer_rx) = unbounded::<LogicToRenderSyncChannel>();
-        let (physics_to_logic_tx, physics_to_logic_rx) = unbounded::<PhysicsToLogicChannel>();
+        let (physics_state_to_logic_tx, physics_state_to_logic_rx) = unbounded::<PhysicsStateToLogicChannel>();
+        let (physics_event_to_logic_tx, physics_event_to_logic_rx) = unbounded::<PhysicsEventToLogicChannel>();
         let (physics_to_renderer_tx, physics_to_renderer_rx) = unbounded::<PhysicsToRenderSyncChannel>();
         let (renderer_to_compositor_tx, renderer_to_compositor_rx) = unbounded::<RenderCommand>();
         let (compositor_to_sysout_tx, compositor_to_sysout_rx) = unbounded::<CompositorToSysOutCommand>();
@@ -131,14 +152,15 @@ impl EngineBus{
 
         EngineBus
         {
-            logic_to_physics          : Channel { tx:logic_to_physics_tx,       rx:logic_to_physics_rx },
-            logic_to_render_sync      : Channel { tx:logic_to_renderer_tx,      rx:logic_to_renderer_rx },
-            physics_to_logic          : Channel { tx:physics_to_logic_tx,       rx:physics_to_logic_rx },
-            physics_to_render_sync    : Channel { tx:physics_to_renderer_tx,    rx:physics_to_renderer_rx },
-            render_sync_to_compositor : Channel { tx:renderer_to_compositor_tx, rx:renderer_to_compositor_rx },
-            compositor_to_sysout      : Channel { tx:compositor_to_sysout_tx,   rx:compositor_to_sysout_rx },
-            sysin_to_logic            : Channel { tx:sysin_to_logic_tx,         rx:sysin_to_logic_rx },
-            sysin_to_compositor       : Channel { tx:sysin_to_compositor_tx,    rx:sysin_to_compositor_rx },
+            logic_to_physics          : Channel { tx:logic_to_physics_tx,        rx:logic_to_physics_rx },
+            logic_to_render_sync      : Channel { tx:logic_to_renderer_tx,       rx:logic_to_renderer_rx },
+            physics_event_to_logic    : Channel { tx:physics_event_to_logic_tx,  rx:physics_event_to_logic_rx },
+            physics_state_to_logic    : Channel { tx:physics_state_to_logic_tx,  rx:physics_state_to_logic_rx },
+            physics_to_render_sync    : Channel { tx:physics_to_renderer_tx,     rx:physics_to_renderer_rx },
+            render_sync_to_compositor : Channel { tx:renderer_to_compositor_tx,  rx:renderer_to_compositor_rx },
+            compositor_to_sysout      : Channel { tx:compositor_to_sysout_tx,    rx:compositor_to_sysout_rx },
+            sysin_to_logic            : Channel { tx:sysin_to_logic_tx,          rx:sysin_to_logic_rx },
+            sysin_to_compositor       : Channel { tx:sysin_to_compositor_tx,     rx:sysin_to_compositor_rx },
         }
     }
 }

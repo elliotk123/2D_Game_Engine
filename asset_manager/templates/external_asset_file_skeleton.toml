@@ -1,0 +1,47 @@
+# manifest.toml
+# All paths are relative to the manifest.toml location (recommended)
+
+[asset_definitions]
+
+# --------------------
+# Sprites
+# --------------------
+
+[[asset_definitions.sprites]]
+    key = "example_sprite"
+    file_path = "assets/sprites/example_sprite.png"
+    size = [32, 32]
+    offset = [0, 0]
+
+# --------------------
+# Sprite sheets
+# --------------------
+
+[[asset_definitions.spritesheets]]
+    key = "example_sheet"
+    file_path = "assets/sheets/example_sheet.png"
+    quantity = 1
+    [[asset_definitions.spritesheets.sprites]]
+        key = "example_sheet_sprite_0"
+        size = [32, 32]
+        offset = [0, 0]
+
+# --------------------
+# Animations (simple constant framerate)
+# --------------------
+
+[[asset_definitions.animations]]
+    key = "example_animation"
+    framerate = 10
+    sprite_keys = ["example_sheet_sprite_0"]
+
+# --------------------
+# Audio clips
+# --------------------
+
+[[asset_definitions.audio]]
+    key = "example_audio"
+    file_path = "assets/audio/example_audio.wav"
+    time_offset = 0      # ms
+    duration = 500      # ms
+```
