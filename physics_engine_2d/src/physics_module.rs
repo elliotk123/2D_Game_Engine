@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use crate::entity_group::EntityGroup;
+use crate::{entity_group::EntityGroup, force_field::reconfigure_deleted_entity};
 
 use super::entity::Entity;
 use super::particle::Particle;
@@ -45,6 +45,16 @@ impl PhysicsModule
                 }=>{
                     self.entity_groups.push(EntityGroup::new(num_entities_pow_2));
                     self.force_fields.push(Vec::new());
+                },
+                LogicToPhysicsChannel::RemoveEntityGroup {
+                    group_index,
+                }=>{
+                    if group_index < self.entity_groups.len(){
+                        self.entity_groups.swap_remove(group_index);
+                         self.force_fields.swap_remove(group_index);
+                    }else{
+                        println!("Cannot remove entity group {} as it doesn't exist", group_index);
+                    }
                 }
                 LogicToPhysicsChannel::AddEntity{
                     group_index,
@@ -84,6 +94,9 @@ impl PhysicsModule
                     index
                 } => {
                     self.entity_groups[group_index].delete_entity(index);
+                    for field in self.force_fields[group_index].iter_mut(){
+                        reconfigure_deleted_entity(index, field);
+                    }
                 },
                 LogicToPhysicsChannel::ApplyForce { 
                     group_index,
@@ -120,6 +133,36 @@ impl PhysicsModule
                 }=> {
                     // self.entity_groups[group_index].apply_field(field);
                     self.force_fields[group_index].push(field);
+                },
+                LogicToPhysicsChannel::DeleteField {
+                    group_index,
+                    field_index
+                }=>{
+                     if let Some(group_fields) = self.force_fields.get_mut(group_index){
+                        if field_index < group_fields.len() {
+                            self.force_fields[group_index].swap_remove(field_index);
+                        }else{
+                            println!("Field {} does not exist for group {}. cannot remove", field_index, group_index);
+                        }
+                    }else{
+                        println!("Group {} does not exist, cannot delete an associated field", group_index);
+                    };
+                        
+                },
+                LogicToPhysicsChannel::UpdateField {
+                    group_index,
+                    field_index,
+                    field
+                }=>{
+                    if let Some(group_fields) = self.force_fields.get_mut(group_index){
+                        if let Some(old_field) = group_fields.get_mut(field_index){
+                            *old_field = field;
+                        }else{
+                            println!("Field {} does not exist for group {}. cannot update", field_index, group_index);
+                        }
+                    }else{
+                        println!("Group {} does not exist, cannot update an associated field", group_index);
+                    };
                 }
             }
         }

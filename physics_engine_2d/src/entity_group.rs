@@ -159,21 +159,25 @@ impl EntityGroup{
         self.torque_accumulators.fill(0.0);
     }
 
-    pub fn delete_entity(&mut self, index : usize){
+    pub fn delete_entity(&mut self, index : usize)->bool{
         if index >= self.num_active_entities{
             println!("Cannot remove entity {}, enttiy not active", index);
-        }else if index == self.num_active_entities - 1{
-            self.num_active_entities -= 1;
-        }else{
-            self.particles.delete_particle(index);
-            self.shapes.swap(index,self.num_active_entities-1);
-            self.masses[index] = self.masses[self.num_active_entities-1];
-            self.moments_of_intertia[index] = self.moments_of_intertia[self.num_active_entities-1];
-            self.force_x_accumulators[index] = self.force_x_accumulators[self.num_active_entities-1];
-            self.force_y_accumulators[index] = self.force_y_accumulators[self.num_active_entities-1];
-            self.torque_accumulators[index] = self.torque_accumulators[self.num_active_entities-1];
-            self.num_active_entities -= 1;
+            return false;
         }
+        let last_idx = self.num_active_entities - 1;
+
+        if index < last_idx{
+            self.particles.delete_particle(index);
+            self.shapes.swap(index,last_idx);
+
+            self.masses[index] = self.masses[last_idx];
+            self.moments_of_intertia[index] = self.moments_of_intertia[last_idx];
+            self.force_x_accumulators[index] = self.force_x_accumulators[last_idx];
+            self.force_y_accumulators[index] = self.force_y_accumulators[last_idx];
+            self.torque_accumulators[index] = self.torque_accumulators[last_idx]
+        }
+        self.num_active_entities -= 1;
+        return true;
     }
 
 

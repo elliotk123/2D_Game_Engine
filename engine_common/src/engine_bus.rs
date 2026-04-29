@@ -28,6 +28,9 @@ pub enum LogicToPhysicsChannel{
     AddEntityGroup{
         num_entities_pow_2 : u32
     },
+    RemoveEntityGroup{
+        group_index : usize
+    },
     AddEntity{
         group_index : usize,
         mass : f64,
@@ -62,6 +65,15 @@ pub enum LogicToPhysicsChannel{
     },
     ApplyField{
         group_index : usize,
+        field : ForceField
+    },
+    DeleteField{
+        group_index : usize,
+        field_index : usize
+    },
+    UpdateField{
+        group_index : usize,
+        field_index : usize,
         field : ForceField
     }
 }
